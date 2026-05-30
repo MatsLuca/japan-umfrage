@@ -2,7 +2,12 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Japan 2026">
 <title>🇯🇵 JAPAN 2026 — Stimmungs-Check</title>
 <!--
   ═══════════════════════════════════════════════════════════════
@@ -19,18 +24,21 @@
   :root{--bg:#0a0a12;--ink:#f4f4f8;--muted:#9a9ab2;--line:rgba(255,255,255,.12);
     --glass:rgba(255,255,255,.05);--red:#ff2d55;--pink:#ff4d8d;--cyan:#19e3ff;--gold:#ffcc4d;--green:#1fd86b;--violet:#9d8cff}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+    -webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh;overflow-x:hidden;overscroll-behavior-y:none}
   body::before{content:"";position:fixed;inset:0;z-index:-2;background:
     radial-gradient(900px 500px at 85% -5%, rgba(255,45,85,.20), transparent 60%),
     radial-gradient(700px 500px at 5% 25%, rgba(25,227,255,.12), transparent 55%),
     radial-gradient(800px 700px at 50% 115%, rgba(255,77,141,.16), transparent 60%),
     linear-gradient(180deg,#0a0a12,#0c0c16 60%,#08080f)}
   ::selection{background:var(--red);color:#fff}
-  .wrap{max-width:640px;margin:0 auto;padding:0 18px;min-height:100vh;display:flex;flex-direction:column}
+  .wrap{max-width:640px;margin:0 auto;padding:0 max(18px,env(safe-area-inset-left)) 0 max(18px,env(safe-area-inset-right));min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
   .pbar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--red),var(--pink),var(--cyan));width:0;z-index:10;transition:width .35s ease;box-shadow:0 0 12px rgba(255,45,85,.6)}
 
-  .stage{flex:1;display:flex;flex-direction:column;justify-content:center;padding:74px 0 20px}
+  .stage{flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(74px + env(safe-area-inset-top)) 0 20px}
+  @keyframes stepIn{from{opacity:0;transform:translateY(16px) scale(.99)}to{opacity:1;transform:none}}
+  @keyframes popIn{0%{opacity:0;transform:scale(.92)}60%{opacity:1;transform:scale(1.02)}100%{transform:scale(1)}}
   .kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--cyan);font-weight:700;margin-bottom:12px}
   h1{font-size:clamp(30px,7vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.04;margin-bottom:12px}
   h1 .jp{display:block;font-size:.45em;color:var(--red);letter-spacing:.15em;margin-bottom:6px}
@@ -97,7 +105,7 @@
   .ideafield{margin-top:14px}
   .ideafield label{font-size:13px;color:var(--muted);font-weight:600;display:block;margin-bottom:6px}
 
-  .nav{position:sticky;bottom:0;display:flex;gap:12px;align-items:center;padding:14px 0 18px;background:linear-gradient(0deg,var(--bg) 62%,transparent)}
+  .nav{position:sticky;bottom:0;display:flex;gap:12px;align-items:center;padding:14px 0 calc(18px + env(safe-area-inset-bottom));background:linear-gradient(0deg,var(--bg) 55%,rgba(10,10,18,.85) 80%,transparent);backdrop-filter:blur(6px)}
   .nav .btn{flex:1}
   .back{flex:0 0 auto;width:52px;background:var(--glass);border:1px solid var(--line);box-shadow:none}
   .skip{flex:0 0 auto;background:transparent;border:0;color:var(--muted);font-size:13px;cursor:pointer;padding:10px;text-decoration:underline;text-underline-offset:3px}
@@ -271,7 +279,7 @@ function render(){
     h=`<div class="kicker">Stimmungs-Check · ehrlich & schnell</div>
        <h1><span class="jp">日本 2026</span>Worauf hast<br>DU Bock?</h1>
        <p class="lead">Wir füllen die Reise mit dem, worauf die meisten Lust haben. Klick dich durch — <b>alles ist optional</b>, überspring einfach, was dir egal ist. Am Ende kriegst du einen Code für Mats. 🚀</p>`;
-    nav.innerHTML=`<button class="btn" onclick="next()">Los geht's →</button>`;return;
+    nav.innerHTML=`<button class="btn" onclick="next()">Los geht's →</button>`;paint(h);return;
   }
   if(st.t==="name"){
     h=`<div class="kicker">Wer bist du?</div><div class="q">Tipp deinen Namen an</div>
@@ -330,25 +338,59 @@ function render(){
        <a class="btn" style="margin-top:10px;text-decoration:none" href="${wa}" target="_blank">💬 Per WhatsApp schicken</a>
        <div class="mini" id="copyMsg"></div>`;
     nav.innerHTML=`<button class="back btn ghost" onclick="prev()">←</button><button class="btn ghost" onclick="restart()">🔄 Neu starten</button>`;
-    stage.innerHTML=h;window.scrollTo(0,0);return;
+    paint(h);setTimeout(confetti,200);return;
   }
 
-  stage.innerHTML=h;
   nav.innerHTML=(step>1?'<button class="back btn ghost" onclick="prev()">←</button>':'')+navHtml;
-  window.scrollTo(0,0);
+  paint(h);
+}
+function paint(h){
+  stage.innerHTML=h;
+  stage.style.animation='none'; void stage.offsetWidth;
+  stage.style.animation='stepIn .42s cubic-bezier(.22,.9,.25,1)';
+  window.scrollTo({top:0,behavior:'instant'});
 }
 function skipBtn(label){return `<button class="skip" onclick="next()">${label||'überspringen ›'}</button>`}
 
 /* interactions */
 function setName(n){A.name=n;render()}
 function setChoice(k,v){A.c[k]=(A.c[k]===v?null:v); if(A.c[k])setTimeout(next,170); else render()}
-function cycle(k,el){const lv=((A.w[k]||0)+1)%4; A.w[k]=lv; el.dataset.lvl=lv; el.querySelector('.lvl').textContent=lv?LVL[lv]:'egal'}
+function cycle(k,el){const lv=((A.w[k]||0)+1)%4; A.w[k]=lv; el.dataset.lvl=lv;
+  const pill=el.querySelector('.lvl'); pill.textContent=lv?LVL[lv]:'egal';
+  if(el.animate){el.animate([{transform:'scale(1)'},{transform:'scale(1.025)'},{transform:'scale(1)'}],{duration:190,easing:'ease-out'});
+    pill.animate([{transform:'scale(1)'},{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(.2,1.4,.4,1)'});}}
 function next(){if(step<STEPS.length-1){step++;render()}}
 function prev(){if(step>0){step--;render()}}
 function restart(){step=0;Object.assign(A,{name:"",s:{},c:{},w:{},ideas:{},t1:"",t2:"",t3:""});render()}
 function copyCode(){const t=document.getElementById('codeOut').textContent;
   navigator.clipboard.writeText(t).then(()=>document.getElementById('copyMsg').textContent="✓ Kopiert!")
    .catch(()=>document.getElementById('copyMsg').textContent="Markier den Code und kopiere manuell.")}
+
+/* ═══════════════ CONFETTI (Result) ═══════════════ */
+function confetti(){
+  const cv=document.createElement('canvas');
+  cv.style.cssText="position:fixed;inset:0;pointer-events:none;z-index:60";
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=innerWidth*dpr; cv.height=innerHeight*dpr;
+  document.body.appendChild(cv);
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const cols=["#ff2d55","#ff4d8d","#19e3ff","#ffcc4d","#9d8cff","#fff"];
+  const P=[]; const W=innerWidth,H=innerHeight;
+  for(let i=0;i<140;i++)P.push({x:W/2+(Math.random()-.5)*120,y:H*0.30,
+    vx:(Math.random()-.5)*11,vy:Math.random()*-13-4,g:.32+Math.random()*.12,
+    s:5+Math.random()*7,rot:Math.random()*6,vr:(Math.random()-.5)*.4,
+    c:cols[i%cols.length],life:0});
+  let t0=null;
+  (function frame(t){ if(!t0)t0=t; const dt=Math.min(32,t-(frame.last||t)); frame.last=t;
+    ctx.clearRect(0,0,W,H); let alive=false;
+    for(const p of P){ p.vy+=p.g*(dt/16); p.x+=p.vx*(dt/16); p.y+=p.vy*(dt/16); p.rot+=p.vr; p.life+=dt;
+      if(p.y<H+30){alive=true;}
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.globalAlpha=Math.max(0,1-p.life/2600); ctx.fillStyle=p.c;
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); ctx.restore(); }
+    if(alive && (t-t0)<2800) requestAnimationFrame(frame); else cv.remove();
+  })(performance.now());
+}
 
 /* ═══════════════ ENCODE / DECODE ═══════════════ */
 function enc(o){return "JP26-"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
