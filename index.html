@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🇯🇵 JAPAN 2026 — Stimmungs-Check</title>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  JAPAN 2026 · STIMMUNGS-UMFRAGE v2 (self-contained, kein Server)
+  ───────────────────────────────────────────────────────────────
+  • Zwei Modi: Umfrage (Standard) + Auswertung (Footer-Link, für Mats).
+  • Jeder klickt durch → Ergebnis-Code (JP26-…) → an Mats schicken.
+  • ALLES skippbar. Must-Sees = Intensität (0 egal · 1 nice · 2 will ich · 3 UNBEDINGT).
+  • Fragen/Listen anpassen → CONFIG unten (VIBES / CHOICES / GROUPS …).
+  • Code-Format: "JP26-" + Base64(JSON v2). enc()/dec(). Auswertung verträgt fehlende Felder.
+  ═══════════════════════════════════════════════════════════════
+-->
+<style>
+  :root{--bg:#0a0a12;--ink:#f4f4f8;--muted:#9a9ab2;--line:rgba(255,255,255,.12);
+    --glass:rgba(255,255,255,.05);--red:#ff2d55;--pink:#ff4d8d;--cyan:#19e3ff;--gold:#ffcc4d;--green:#1fd86b;--violet:#9d8cff}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(900px 500px at 85% -5%, rgba(255,45,85,.20), transparent 60%),
+    radial-gradient(700px 500px at 5% 25%, rgba(25,227,255,.12), transparent 55%),
+    radial-gradient(800px 700px at 50% 115%, rgba(255,77,141,.16), transparent 60%),
+    linear-gradient(180deg,#0a0a12,#0c0c16 60%,#08080f)}
+  ::selection{background:var(--red);color:#fff}
+  .wrap{max-width:640px;margin:0 auto;padding:0 18px;min-height:100vh;display:flex;flex-direction:column}
+  .pbar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--red),var(--pink),var(--cyan));width:0;z-index:10;transition:width .35s ease;box-shadow:0 0 12px rgba(255,45,85,.6)}
+
+  .stage{flex:1;display:flex;flex-direction:column;justify-content:center;padding:74px 0 20px}
+  .kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--cyan);font-weight:700;margin-bottom:12px}
+  h1{font-size:clamp(30px,7vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.04;margin-bottom:12px}
+  h1 .jp{display:block;font-size:.45em;color:var(--red);letter-spacing:.15em;margin-bottom:6px}
+  .q{font-size:clamp(21px,5vw,29px);font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14.5px;margin-bottom:22px}
+  p.lead{color:var(--muted);font-size:16px;line-height:1.6;margin-bottom:26px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;cursor:pointer;
+    font-weight:700;font-size:16px;border-radius:100px;padding:16px 26px;color:#fff;
+    background:linear-gradient(100deg,var(--red),var(--pink));box-shadow:0 14px 34px -12px rgba(255,45,85,.6);
+    transition:transform .15s,opacity .15s;width:100%}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:var(--glass);border:1px solid var(--line);box-shadow:none;color:var(--ink)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{padding:13px 20px;border-radius:100px;border:1.5px solid var(--line);background:var(--glass);
+    font-size:16px;font-weight:600;cursor:pointer;transition:.18s}
+  .chip:active{transform:scale(.95)}
+  .chip.on{border-color:var(--red);background:rgba(255,45,85,.16);color:#fff;box-shadow:0 0 0 3px rgba(255,45,85,.12)}
+
+  /* sliders */
+  .slider-row{margin-bottom:22px}
+  .slider-row .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .slider-row .lbl{font-size:16.5px;font-weight:700}
+  .slider-row .val{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--cyan);min-width:34px;text-align:right}
+  .slider-row .val.off{color:var(--muted)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:100px;background:rgba(255,255,255,.12);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--pink));cursor:pointer;box-shadow:0 4px 12px -2px rgba(255,45,85,.7);border:3px solid #fff}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--red);border:3px solid #fff;cursor:pointer}
+  .scale-hint{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+
+  /* this-or-that */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .vs .opt{border:1.5px solid var(--line);background:var(--glass);border-radius:20px;padding:28px 16px;text-align:center;cursor:pointer;transition:.18s}
+  .vs .opt:active{transform:scale(.96)}
+  .vs .opt.on{border-color:var(--cyan);background:rgba(25,227,255,.12);box-shadow:0 0 0 3px rgba(25,227,255,.12)}
+  .vs .opt .ic{font-size:44px;line-height:1;margin-bottom:12px}
+  .vs .opt .t{font-size:16.5px;font-weight:700}
+  .vs-mid{text-align:center;color:var(--muted);font-weight:800;letter-spacing:.2em;margin:12px 0 2px;font-size:13px}
+
+  /* must-see intensity rows */
+  .legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;font-size:11.5px}
+  .legend span{padding:4px 9px;border-radius:100px;border:1px solid var(--line);color:var(--muted)}
+  .legend .l1{color:var(--cyan)} .legend .l2{color:var(--pink)} .legend .l3{color:var(--red);border-color:rgba(255,45,85,.4)}
+  .ms{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);background:var(--glass);border-radius:14px;
+    padding:13px 15px;margin-bottom:9px;cursor:pointer;transition:.14s;user-select:none}
+  .ms:active{transform:scale(.985)}
+  .ms .ml{flex:1;font-size:15.5px;font-weight:700;line-height:1.25}
+  .ms .ml .mh{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:3px;line-height:1.3}
+  .ms .lvl{flex:0 0 auto;font-size:12px;font-weight:800;letter-spacing:.04em;padding:6px 11px;border-radius:100px;border:1px solid var(--line);color:var(--muted);min-width:96px;text-align:center}
+  .ms[data-lvl="1"]{border-color:rgba(25,227,255,.45);background:rgba(25,227,255,.08)}
+  .ms[data-lvl="1"] .lvl{color:var(--cyan);border-color:rgba(25,227,255,.5)}
+  .ms[data-lvl="2"]{border-color:rgba(255,77,141,.5);background:rgba(255,77,141,.10)}
+  .ms[data-lvl="2"] .lvl{color:var(--pink);border-color:rgba(255,77,141,.6)}
+  .ms[data-lvl="3"]{border-color:rgba(255,45,85,.75);background:rgba(255,45,85,.16);box-shadow:0 0 0 2px rgba(255,45,85,.18)}
+  .ms[data-lvl="3"] .lvl{color:#fff;background:linear-gradient(100deg,var(--red),var(--pink));border-color:transparent}
+  .tap-hint{font-size:11.5px;color:var(--muted);text-align:center;margin:2px 0 14px}
+
+  textarea,input[type=text]{width:100%;background:var(--glass);border:1.5px solid var(--line);border-radius:14px;
+    color:var(--ink);font-size:16px;padding:14px;font-family:inherit;resize:vertical}
+  textarea:focus,input[type=text]:focus{outline:none;border-color:var(--cyan)}
+  label.fl{display:block;font-size:15px;font-weight:700;margin:18px 0 8px}
+  .ideafield{margin-top:14px}
+  .ideafield label{font-size:13px;color:var(--muted);font-weight:600;display:block;margin-bottom:6px}
+
+  .nav{position:sticky;bottom:0;display:flex;gap:12px;align-items:center;padding:14px 0 18px;background:linear-gradient(0deg,var(--bg) 62%,transparent)}
+  .nav .btn{flex:1}
+  .back{flex:0 0 auto;width:52px;background:var(--glass);border:1px solid var(--line);box-shadow:none}
+  .skip{flex:0 0 auto;background:transparent;border:0;color:var(--muted);font-size:13px;cursor:pointer;padding:10px;text-decoration:underline;text-underline-offset:3px}
+
+  .codebox{background:#000;border:1.5px solid var(--line);border-radius:14px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all;color:var(--cyan);max-height:130px;overflow:auto;margin:12px 0}
+  .mini{font-size:13px;color:var(--muted);text-align:center;margin-top:14px}
+  .footlink{text-align:center;padding:16px 0 30px;color:var(--muted);font-size:12px}
+  .footlink a{color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+  /* Auswertung */
+  #analyse{display:none}
+  .res-card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+  .res-card h3{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .bar-row{margin-bottom:11px}
+  .bar-row .bt{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px;gap:8px}
+  .bar-row .bt b{font-weight:700}
+  .bar-row .bt .sc{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+  .track{height:11px;border-radius:100px;background:rgba(255,255,255,.08);overflow:hidden}
+  .fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--red),var(--pink))}
+  .fill.g{background:linear-gradient(90deg,var(--green),#10b894)}
+  .fill.y{background:linear-gradient(90deg,var(--gold),#ff9d2d)}
+  .tag{font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:100px;border:1px solid var(--line);color:var(--muted)}
+  .tag.einig{color:var(--green);border-color:rgba(31,216,107,.4)}
+  .tag.split{color:var(--gold);border-color:rgba(255,204,77,.4)}
+  .tag.fire{color:#fff;background:linear-gradient(100deg,var(--red),var(--pink));border-color:transparent}
+  .splitbar{display:flex;height:32px;border-radius:10px;overflow:hidden;font-size:13px;font-weight:700}
+  .splitbar .a{background:rgba(25,227,255,.25);display:flex;align-items:center;padding:0 10px}
+  .splitbar .b{background:rgba(255,77,141,.25);display:flex;align-items:center;justify-content:flex-end;padding:0 10px}
+  .ft{border-left:3px solid var(--red);padding:6px 0 6px 12px;margin-bottom:10px}
+  .ft .who{font-size:12px;color:var(--cyan);font-weight:700}
+  .ft .tx{font-size:15px}
+  .ppl{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+  .ppl span{font-size:12px;padding:4px 10px;border-radius:100px;background:rgba(31,216,107,.14);border:1px solid rgba(31,216,107,.3);color:var(--green)}
+  .hl{background:rgba(31,216,107,.07);border:1px solid rgba(31,216,107,.25)}
+  .warn{background:rgba(255,204,77,.06);border:1px solid rgba(255,204,77,.25)}
+</style>
+</head>
+<body>
+<div class="pbar" id="pbar"></div>
+<div class="wrap">
+  <div id="quiz">
+    <div class="stage" id="stage"></div>
+    <div class="nav" id="nav"></div>
+  </div>
+
+  <div id="analyse">
+    <div class="stage" style="justify-content:flex-start">
+      <div class="kicker">Nur für Mats</div>
+      <h1 style="font-size:34px">📊 Auswertung</h1>
+      <p class="lead">Alle Ergebnis-Codes der Jungs hier einfügen — einer pro Zeile. Dann „Auswerten".</p>
+      <textarea id="codes" rows="6" placeholder="JP26-…&#10;JP26-…"></textarea>
+      <button class="btn" style="margin-top:14px" onclick="analyse()">🔮 Auswerten</button>
+      <div id="results" style="margin-top:26px"></div>
+    </div>
+  </div>
+
+  <div class="footlink"><a id="modeToggle" onclick="toggleMode()">🔍 Auswertung (für Mats)</a></div>
+</div>
+
+<script>
+/* ═══════════════ CONFIG ═══════════════ */
+const CREW = ["Mats","Sebastian","Marko","Emre","Hendrik","Cristobal"];
+
+const VIBES = [
+  {k:"kultur", l:"⛩️ Kultur & Geschichte"},
+  {k:"action", l:"⚡ Action & Adrenalin"},
+  {k:"night",  l:"🍻 Nightlife & Feiern"},
+  {k:"food",   l:"🍜 Essen & Genuss"},
+  {k:"chill",  l:"♨️ Natur & Entspannung"},
+  {k:"nerd",   l:"🎮 Anime, Gaming & Tech"},
+];
+
+const CHOICES = [
+  {k:"c1", q:"Was zieht dich mehr?",          a:{ic:"⛩️",t:"Tempel"},              b:{ic:"🗼",t:"Tower / Skyline"}},
+  {k:"c2", q:"Beim Essen lieber…",            a:{ic:"🍜",t:"Ramen-Bude"},          b:{ic:"🍽️",t:"Fine Dining"}},
+  {k:"c3", q:"Der perfekte Morgen?",          a:{ic:"🌅",t:"Sonnenaufgang am Fuji"},b:{ic:"😴",t:"Ausschlafen"}},
+  {k:"c4", q:"Abends eher…",                  a:{ic:"🎤",t:"Karaoke"},             b:{ic:"🍸",t:"Bar-Hopping"}},
+  {k:"c5", q:"Wie sollen die Tage sein?",     a:{ic:"⚡",t:"Vollgepackt"},          b:{ic:"🌿",t:"Entspannt"}},
+  {k:"c6", q:"Dein Rhythmus?",                a:{ic:"🐓",t:"Frühaufsteher"},        b:{ic:"🦉",t:"Nachteule"}},
+  {k:"c7", q:"Reise-Stil?",                   a:{ic:"🗺️",t:"Lieber geplant"},      b:{ic:"🎲",t:"Spontan treiben lassen"}},
+];
+
+// Must-See-Gruppen — Reihenfolge: Klassiker (jeder kennt's) oben → spezieller unten.
+// sub = kurze Erklärung, falls der Begriff nicht selbsterklärend ist.
+const GROUPS = [
+  {key:"tokyo", t:"🗼 Tokyo & Stadt-Vibes", items:[
+    {k:"shibuya",  l:"Shibuya Crossing & Shibuya Sky", sub:"Die berühmteste Kreuzung der Welt + Aussichts-Deck darüber"},
+    {k:"skytower", l:"Tokyo Skytree / Tokyo Tower",   sub:"Hoch auf den Turm für den Blick über die Mega-City"},
+    {k:"shinjuku", l:"Shinjuku bei Nacht",            sub:"Riesiges Neon-Ausgehviertel mit winzigen Gassen-Bars"},
+    {k:"akiba",    l:"Akihabara",                      sub:"Das Viertel für Games, Anime, Elektronik & Arcades"},
+    {k:"harajuku", l:"Harajuku & Takeshita-Street",   sub:"Bunte Mode-/Jugendkultur-Straße mit Crêpes & Trends"},
+    {k:"asakusa",  l:"Asakusa & Sensō-ji",            sub:"Tokyos ältester Tempel mit langer Markt-Einkaufsstraße"},
+    {k:"shopping", l:"Mega-Shopping",                  sub:"Don Quijote (riesiger 24h-Ramschladen) & Nobel-Viertel Ginza"},
+    {k:"odaiba",   l:"Odaiba",                         sub:"Bay-Insel mit lebensgroßer Gundam-Roboter-Statue & Malls"},
+  ]},
+  {key:"kultur", t:"⛩️ Kultur & Klassiker", items:[
+    {k:"fushimi",  l:"Fushimi Inari – die roten Tore", sub:"Tausende leuchtend rote Tor-Tunnel einen Berg hinauf (Kyoto)"},
+    {k:"nara",     l:"Nara – die zahmen Rehe",         sub:"Park voller freilaufender Rehe + großer Bronze-Buddha"},
+    {k:"bamboo",   l:"Arashiyama Bambuswald",          sub:"Der berühmte Pfad durch meterhohen Bambus (Kyoto)"},
+    {k:"kiyomizu", l:"Kiyomizu-dera",                  sub:"Holz-Tempel auf Stelzen mit Aussicht über Kyoto"},
+    {k:"kinkaku",  l:"Goldener Pavillon",              sub:"Komplett goldener Tempel am Teich – Kyotos Postkartenmotiv"},
+    {k:"castle",   l:"Japanische Burg",                sub:"Klassische Samurai-Burg mit geschwungenen Dächern (z.B. Osaka)"},
+    {k:"meiji",    l:"Meiji-Schrein",                  sub:"Großer Schrein im Wald mitten in Tokyo"},
+    {k:"yukata",   l:"Kimono / Yukata tragen",         sub:"Im traditionellen Gewand durch die Altstadt"},
+    {k:"ryokan",   l:"Nacht im Ryokan",                sub:"Traditionelles Gasthaus: auf Tatami schlafen + eigenes heißes Bad"},
+  ]},
+  {key:"food", t:"🍜 Essen & Trinken", items:[
+    {k:"sushi",   l:"Frisches Sushi am Fischmarkt", sub:"Sushi-Frühstück am riesigen Toyosu-Fischmarkt in Tokyo"},
+    {k:"ramen",   l:"Ramen-Tour",                   sub:"Sich durch verschiedene Nudelsuppen-Läden futtern"},
+    {k:"wagyu",   l:"Wagyu / Kobe-Beef",            sub:"Das berühmte, fein marmorierte Premium-Rindfleisch"},
+    {k:"street",  l:"Street Food in Osaka",          sub:"Dotonbori-Fressmeile: Takoyaki (Oktopus-Bällchen) & Co."},
+    {k:"izakaya", l:"Izakaya-Abend",                sub:"Japanische Kneipe – kleine Gerichte + Bier/Sake teilen"},
+    {k:"conbini", l:"Conbini-Gourmet",              sub:"Überraschend gutes Essen aus 24h-Läden (7-Eleven, Lawson)"},
+    {k:"kaiten",  l:"Förderband-Sushi",             sub:"Sushi fährt auf dem Laufband zu dir an den Platz"},
+    {k:"sake",    l:"Sake / Strong Zero",           sub:"Reiswein verkosten / das berüchtigte starke Dosen-Getränk"},
+    {k:"cafe",    l:"Themen-Café",                  sub:"Skurrile Cafés (Katzen, Maid-Service, Game-Charaktere …)"},
+  ]},
+  {key:"natur", t:"🏞️ Natur & Tagesausflüge", items:[
+    {k:"fuji",      l:"Mt. Fuji sehen",            sub:"Japans heiliger Vulkan – aus der Nähe / vom See aus"},
+    {k:"kawaguchi", l:"Lake Kawaguchiko",          sub:"Bergsee mit Top-Fuji-Blick (liegt eh auf unserem Roadtrip)"},
+    {k:"onsen",     l:"Onsen-Bad",                 sub:"In natürlichen heißen Quellen entspannen"},
+    {k:"beach",     l:"Strand & Pazifik (Izu)",    sub:"Baden am Meer auf der Izu-Halbinsel"},
+    {k:"kamakura",  l:"Kamakura",                  sub:"Küstenstädtchen mit riesigem Bronze-Buddha + Strand"},
+    {k:"hakone",    l:"Hakone",                    sub:"Bergregion mit heißen Quellen, See & Seilbahn"},
+    {k:"nikko",     l:"Nikko",                     sub:"Prunkvolle Schreine + kurvige Bergstraße nördlich von Tokyo"},
+    {k:"fujiclimb", l:"Fuji besteigen",            sub:"Nachts hochwandern für den Sonnenaufgang am Gipfel (anstrengend!)"},
+  ]},
+  {key:"fun", t:"🎮 Nerd, Fun & Action", items:[
+    {k:"usj",      l:"Universal Studios / Nintendo World", sub:"Großer Freizeitpark in Osaka mit Mario-Themenwelt"},
+    {k:"teamlab",  l:"teamLab",                    sub:"Begehbares, interaktives Licht- & Digitalkunst-Museum"},
+    {k:"gokart",   l:"Mario-Kart durch die Stadt", sub:"Im Kostüm in echten Go-Karts über die Straßen (Foto-Hit)"},
+    {k:"arcade",   l:"Spielhallen / Arcades",      sub:"Mehrstöckige Game-Center mit Greifautomaten & Automaten"},
+    {k:"baseball", l:"Baseball-Spiel live",        sub:"Japans Lieblingssport mit völlig irrer Fan-Stimmung"},
+    {k:"ninten",   l:"Nintendo Museum",            sub:"Neues Museum bei Kyoto (nur mit Verlosungs-Ticket)"},
+    {k:"sumo",     l:"Sumo erleben",               sub:"Ringkampf-Turnier ansehen oder morgens beim Training zuschauen"},
+    {k:"vr",       l:"VR / Action-Park",           sub:"Virtual-Reality-Games & Adrenalin-Attraktionen"},
+  ]},
+  {key:"night", t:"🌃 Nightlife", items:[
+    {k:"karaoke",  l:"Karaoke",            sub:"Eigene Box mit Mikro & Getränken – der Klassiker"},
+    {k:"barhop",   l:"Bar-Hopping",        sub:"Von Bar zu Bar durch die Ausgehviertel ziehen"},
+    {k:"club",     l:"Club / Techno",      sub:"Feiern in den Clubs von Shibuya / Shinjuku"},
+    {k:"goldengai",l:"Golden Gai",         sub:"Gassen voller winziger Kult-Bars (je nur 5–10 Plätze) in Shinjuku"},
+    {k:"robot",    l:"Themen- / Robot-Bars",sub:"Schräge Erlebnis-Bars mit überdrehter Show"},
+    {k:"pachinko", l:"Pachinko",           sub:"Japans laute Glücksspiel-Spielhallen mal von innen sehen"},
+  ]},
+];
+const LVL=["egal","nice 🙂","will ich 👍","UNBEDINGT 🔥"];
+const ALL_ITEMS=[]; GROUPS.forEach(g=>g.items.forEach(it=>ALL_ITEMS.push({...it,grp:g.t})));
+
+/* ═══════════════ STATE ═══════════════ */
+const A={v:2,name:"",s:{},c:{},w:{},ideas:{},t1:"",t2:"",t3:""};
+let step=0,STEPS=[];
+function buildSteps(){
+  STEPS=[{t:"intro"},{t:"name"},{t:"vibes"}];
+  CHOICES.forEach((c,i)=>STEPS.push({t:"choice",i}));
+  GROUPS.forEach((g,i)=>STEPS.push({t:"group",i}));
+  STEPS.push({t:"text"},{t:"result"});
+}
+buildSteps();
+
+/* ═══════════════ RENDER ═══════════════ */
+const stage=document.getElementById('stage'),nav=document.getElementById('nav'),pbar=document.getElementById('pbar');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){
+  const st=STEPS[step];
+  pbar.style.width=(step/(STEPS.length-1)*100)+'%';
+  let h="",navHtml="";
+
+  if(st.t==="intro"){
+    h=`<div class="kicker">Stimmungs-Check · ehrlich & schnell</div>
+       <h1><span class="jp">日本 2026</span>Worauf hast<br>DU Bock?</h1>
+       <p class="lead">Wir füllen die Reise mit dem, worauf die meisten Lust haben. Klick dich durch — <b>alles ist optional</b>, überspring einfach, was dir egal ist. Am Ende kriegst du einen Code für Mats. 🚀</p>`;
+    nav.innerHTML=`<button class="btn" onclick="next()">Los geht's →</button>`;return;
+  }
+  if(st.t==="name"){
+    h=`<div class="kicker">Wer bist du?</div><div class="q">Tipp deinen Namen an</div>
+       <div class="sub">Damit Mats weiß, von wem die Antworten sind.</div>
+       <div class="chips">${CREW.map(n=>`<div class="chip ${A.name===n?'on':''}" onclick="setName('${n}')">${n}</div>`).join('')}</div>`;
+    navHtml=`<button class="btn" onclick="next()" ${A.name?'':'disabled'}>Weiter →</button>`;
+  }
+  else if(st.t==="vibes"){
+    h=`<div class="kicker">Grund-Vibe</div><div class="q">Wie tickst du grob?</div>
+       <div class="sub">0 = null Bock · 10 = absolut. (Zieh nur, was zutrifft — Rest überspringen.)</div>
+       ${VIBES.map(x=>{const v=A.s[x.k];return `
+        <div class="slider-row">
+          <div class="top"><span class="lbl">${x.l}</span><span class="val ${v==null?'off':''}" id="v_${x.k}">${v==null?'–':v}</span></div>
+          <input type="range" min="0" max="10" value="${v==null?5:v}" oninput="A.s['${x.k}']=+this.value;var e=document.getElementById('v_${x.k}');e.textContent=this.value;e.classList.remove('off')">
+        </div>`}).join('')}`;
+    navHtml=skipBtn()+`<button class="btn" onclick="next()">Weiter →</button>`;
+  }
+  else if(st.t==="choice"){
+    const c=CHOICES[st.i],cur=A.c[c.k];
+    h=`<div class="kicker">Entweder / Oder · ${st.i+1}/${CHOICES.length}</div><div class="q">${c.q}</div>
+       <div class="vs">
+         <div class="opt ${cur==='a'?'on':''}" onclick="setChoice('${c.k}','a')"><div class="ic">${c.a.ic}</div><div class="t">${c.a.t}</div></div>
+         <div class="opt ${cur==='b'?'on':''}" onclick="setChoice('${c.k}','b')"><div class="ic">${c.b.ic}</div><div class="t">${c.b.t}</div></div>
+       </div><div class="vs-mid">— oder —</div>`;
+    navHtml=skipBtn("egal ›")+`<button class="btn ghost" onclick="next()">Weiter →</button>`;
+  }
+  else if(st.t==="group"){
+    const g=GROUPS[st.i];
+    h=`<div class="kicker">Must-Sees · Kategorie ${st.i+1}/${GROUPS.length}</div><div class="q">${g.t}</div>
+       <div class="legend"><span>1× = <span class="l1">nice</span></span><span>2× = <span class="l2">will ich</span></span><span>3× = <span class="l3">UNBEDINGT</span></span></div>
+       <div class="tap-hint">Tippen stuft hoch · nochmal tippen = zurück auf egal</div>
+       ${g.items.map(it=>{const lv=A.w[it.k]||0;return `
+         <div class="ms" data-lvl="${lv}" onclick="cycle('${it.k}',this)">
+           <span class="ml">${it.l}${it.sub?`<span class="mh">${it.sub}</span>`:''}</span><span class="lvl">${lv?LVL[lv]:'egal'}</span></div>`}).join('')}
+       <div class="ideafield"><label>➕ Eigene Idee in „${g.t.replace(/^[^ ]+ /,'')}" (optional)</label>
+         <input type="text" value="${esc(A.ideas[g.key]||'')}" placeholder="Dein eigener Vorschlag…" oninput="A.ideas['${g.key}']=this.value"></div>`;
+    navHtml=skipBtn()+`<button class="btn" onclick="next()">Weiter →</button>`;
+  }
+  else if(st.t==="text"){
+    h=`<div class="kicker">Zum Schluss · Klartext</div><div class="q">Deine eigenen Worte</div>
+       <label class="fl">🔥 Dein #1 absolutes Must-Do</label>
+       <input type="text" value="${esc(A.t1)}" placeholder="Das EINE, das auf keinen Fall fehlen darf" oninput="A.t1=this.value">
+       <label class="fl">🚫 No-Go — worauf hast du KEIN Bock?</label>
+       <input type="text" value="${esc(A.t2)}" placeholder="z.B. stundenlang shoppen, früh aufstehen…" oninput="A.t2=this.value">
+       <label class="fl">💭 Sonstige Ideen / Wünsche?</label>
+       <textarea rows="3" placeholder="Alles, was dir noch einfällt — eigene Spots, Wünsche, Geheimtipps…" oninput="A.t3=this.value">${esc(A.t3)}</textarea>`;
+    navHtml=skipBtn()+`<button class="btn" onclick="next()">Fertig ✓</button>`;
+  }
+  else if(st.t==="result"){
+    const code=enc(A);
+    const wa="https://wa.me/?text="+encodeURIComponent("🇯🇵 Japan-Umfrage von "+(A.name||"?")+":\n\n"+code);
+    h=`<div class="kicker">Fertig 🎉</div><div class="q">Danke, ${esc(A.name)||'Bro'}!</div>
+       <p class="lead">Das ist dein Ergebnis-Code. Schick ihn an Mats — am einfachsten per WhatsApp-Button.</p>
+       <div class="codebox" id="codeOut">${code}</div>
+       <button class="btn" onclick="copyCode()">📋 Code kopieren</button>
+       <a class="btn" style="margin-top:10px;text-decoration:none" href="${wa}" target="_blank">💬 Per WhatsApp schicken</a>
+       <div class="mini" id="copyMsg"></div>`;
+    nav.innerHTML=`<button class="back btn ghost" onclick="prev()">←</button><button class="btn ghost" onclick="restart()">🔄 Neu starten</button>`;
+    stage.innerHTML=h;window.scrollTo(0,0);return;
+  }
+
+  stage.innerHTML=h;
+  nav.innerHTML=(step>1?'<button class="back btn ghost" onclick="prev()">←</button>':'')+navHtml;
+  window.scrollTo(0,0);
+}
+function skipBtn(label){return `<button class="skip" onclick="next()">${label||'überspringen ›'}</button>`}
+
+/* interactions */
+function setName(n){A.name=n;render()}
+function setChoice(k,v){A.c[k]=(A.c[k]===v?null:v); if(A.c[k])setTimeout(next,170); else render()}
+function cycle(k,el){const lv=((A.w[k]||0)+1)%4; A.w[k]=lv; el.dataset.lvl=lv; el.querySelector('.lvl').textContent=lv?LVL[lv]:'egal'}
+function next(){if(step<STEPS.length-1){step++;render()}}
+function prev(){if(step>0){step--;render()}}
+function restart(){step=0;Object.assign(A,{name:"",s:{},c:{},w:{},ideas:{},t1:"",t2:"",t3:""});render()}
+function copyCode(){const t=document.getElementById('codeOut').textContent;
+  navigator.clipboard.writeText(t).then(()=>document.getElementById('copyMsg').textContent="✓ Kopiert!")
+   .catch(()=>document.getElementById('copyMsg').textContent="Markier den Code und kopiere manuell.")}
+
+/* ═══════════════ ENCODE / DECODE ═══════════════ */
+function enc(o){return "JP26-"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
+function dec(s){s=s.trim().replace(/^JP26-/,"");return JSON.parse(decodeURIComponent(escape(atob(s))))}
+
+/* ═══════════════ MODE TOGGLE ═══════════════ */
+function toggleMode(){
+  const q=document.getElementById('quiz'),an=document.getElementById('analyse'),tg=document.getElementById('modeToggle');
+  const showA=an.style.display!=="block";
+  an.style.display=showA?"block":"none";q.style.display=showA?"none":"block";
+  tg.textContent=showA?"← Zurück zur Umfrage":"🔍 Auswertung (für Mats)";
+  pbar.style.width="0";window.scrollTo(0,0);
+}
+
+/* ═══════════════ AUSWERTUNG ═══════════════ */
+function analyse(){
+  const raw=document.getElementById('codes').value.split(/\s+/).filter(x=>x.includes("JP26-"));
+  const subs=[],bad=[];
+  raw.forEach(r=>{try{subs.push(dec(r))}catch(e){bad.push(r.slice(0,10))}});
+  const out=document.getElementById('results');
+  if(!subs.length){out.innerHTML=`<div class="res-card warn">Keine gültigen Codes erkannt. Einen Code pro Zeile (beginnt mit <b>JP26-</b>).</div>`;return;}
+  const N=subs.length, avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0, std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)))};
+
+  let html=`<div class="res-card hl"><h3>👥 ${N} Antworten</h3><div class="ppl">${subs.map(s=>`<span>${esc(s.name||'?')}</span>`).join('')}</div>
+     ${bad.length?`<div class="mini" style="text-align:left;color:var(--gold)">⚠️ ${bad.length} Code(s) unlesbar</div>`:''}</div>`;
+
+  // ── MUST-SEE RANKING (Kern-Deliverable) ──
+  const ranked=ALL_ITEMS.map(it=>{
+    const vals=subs.map(s=>(s.w&&s.w[it.k]!=null)?s.w[it.k]:0);
+    return {it,m:avg(vals),fire:vals.filter(v=>v===3).length,want:vals.filter(v=>v>=2).length,sd:std(vals),vals};
+  }).sort((a,b)=>b.m-a.m || b.fire-a.fire);
+  html+=`<div class="res-card"><h3>🎯 Must-See-Ranking <span class="tag">für die leeren Tage</span></h3>`+
+    ranked.map(r=>{
+      const pct=r.m/3*100, cls=r.m>=2.2?'g':(r.m<=0.7?'y':'');
+      const badge=r.fire?`<span class="tag fire">${r.fire}× 🔥</span>`:'';
+      return `<div class="bar-row"><div class="bt"><b>${esc(r.it.l)} ${badge}</b><span class="sc">Ø ${r.m.toFixed(1)} · ${r.want}/${N} wollen</span></div>
+        <div class="track"><div class="fill ${cls}" style="width:${pct}%"></div></div></div>`;
+    }).join('')+`</div>`;
+
+  // ── TOP-KONSENS & STREIT ──
+  const konsens=ranked.filter(r=>r.m>=2 && r.sd<=0.9).slice(0,8);
+  const streit=[...ranked].filter(r=>r.sd>=1.1).sort((a,b)=>b.sd-a.sd).slice(0,8);
+  if(konsens.length)html+=`<div class="res-card hl"><h3>✅ Alle einig & heiß drauf</h3>${konsens.map(r=>`<div class="bar-row"><div class="bt"><b>${esc(r.it.l)}</b><span class="sc">Ø ${r.m.toFixed(1)}</span></div></div>`).join('')}</div>`;
+  if(streit.length)html+=`<div class="res-card warn"><h3>⚔️ Streitthemen (Lager gespalten)</h3>${streit.map(r=>`<div class="bar-row"><div class="bt"><b>${esc(r.it.l)}</b><span class="sc">Spanne ${Math.min(...r.vals)}–${Math.max(...r.vals)}</span></div></div>`).join('')}</div>`;
+
+  // ── VIBE ──
+  const vr=VIBES.map(x=>{const v=subs.map(s=>(s.s&&s.s[x.k]!=null)?s.s[x.k]:null).filter(z=>z!=null);return{x,m:avg(v),n:v.length}}).sort((a,b)=>b.m-a.m);
+  html+=`<div class="res-card"><h3>🎭 Grund-Vibe der Gruppe</h3>`+vr.map(r=>`<div class="bar-row"><div class="bt"><b>${r.x.l}</b><span class="sc">Ø ${r.m.toFixed(1)}${r.n<N?` · ${r.n}/${N}`:''}</span></div><div class="track"><div class="fill" style="width:${r.m*10}%"></div></div></div>`).join('')+`</div>`;
+
+  // ── ENTWEDER/ODER ──
+  html+=`<div class="res-card"><h3>🔀 Entweder / Oder</h3>`+CHOICES.map(c=>{
+    const av=subs.filter(s=>s.c&&s.c[c.k]==='a').length,bv=subs.filter(s=>s.c&&s.c[c.k]==='b').length,tot=av+bv||1;
+    return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>${c.a.ic} ${c.a.t}</span><span>${c.b.t} ${c.b.ic}</span></div>
+      <div class="splitbar"><div class="a" style="width:${av/tot*100}%">${av||''}</div><div class="b" style="width:${bv/tot*100}%">${bv||''}</div></div></div>`;
+  }).join('')+`</div>`;
+
+  // ── EIGENE IDEEN ──
+  let ideas=[];
+  subs.forEach(s=>{if(s.ideas)Object.entries(s.ideas).forEach(([g,v])=>{if(v&&v.trim())ideas.push({who:s.name,g,v})})});
+  if(ideas.length)html+=`<div class="res-card"><h3>💡 Eigene Ideen aus den Kategorien</h3>${ideas.map(i=>`<div class="ft" style="border-color:var(--violet)"><div class="who">${esc(i.who||'?')}</div><div class="tx">${esc(i.v)}</div></div>`).join('')}</div>`;
+
+  // ── FREITEXT ──
+  const f1=subs.filter(s=>s.t1&&s.t1.trim()),f2=subs.filter(s=>s.t2&&s.t2.trim()),f3=subs.filter(s=>s.t3&&s.t3.trim());
+  html+=`<div class="res-card"><h3>🔥 Die #1 Must-Dos</h3>${f1.length?f1.map(s=>`<div class="ft"><div class="who">${esc(s.name)}</div><div class="tx">${esc(s.t1)}</div></div>`).join(''):'<div class="mini" style="text-align:left">—</div>'}</div>`;
+  html+=`<div class="res-card warn"><h3>🚫 No-Gos</h3>${f2.length?f2.map(s=>`<div class="ft" style="border-color:var(--gold)"><div class="who">${esc(s.name)}</div><div class="tx">${esc(s.t2)}</div></div>`).join(''):'<div class="mini" style="text-align:left">—</div>'}</div>`;
+  if(f3.length)html+=`<div class="res-card"><h3>💭 Sonstige Wünsche</h3>${f3.map(s=>`<div class="ft" style="border-color:var(--cyan)"><div class="who">${esc(s.name)}</div><div class="tx">${esc(s.t3)}</div></div>`).join('')}</div>`;
+
+  out.innerHTML=html;
+}
+
+render();
+</script>
+</body>
+</html>
