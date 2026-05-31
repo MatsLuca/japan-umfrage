@@ -3,73 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🇯🇵 Japan 2026 – Umfrage-Auswertung</title>
+<title>結果 — Japan 2026 Auswertung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0e0f1a; --card:#171a2b; --card2:#1f2338; --line:#2c3150;
-    --txt:#eef0fb; --mut:#9aa0c4; --acc:#ff4d6d; --acc2:#ffd166;
-    --good:#4ade80; --warn:#fb923c; --bad:#f87171; --blue:#60a5fa;
+    /* legacy-Namen (von der Render-Logik inline genutzt) — neu eingefärbt */
+    --bg:#1c1f2b; --card:#23273a; --card2:#2b3049; --line:rgba(246,241,230,.16);
+    --txt:#f6f1e6; --mut:#cfc8b8; --acc:#f04634; --acc2:#e7b552;
+    --good:#5cc98c; --warn:#efaa55; --bad:#f0796b; --blue:#6aa8ff;
+    /* neue Tokens */
+    --paper-soft:#e3ddcf; --vermilion:#f04634; --gold:#e7b552;
+    --serif:"Shippori Mincho B1",serif; --sans:"Zen Kaku Gothic New",sans-serif;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#1b1f38 0%,var(--bg) 60%);
-       color:var(--txt);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-       -webkit-font-smoothing:antialiased;padding:24px 16px 80px}
-  .wrap{max-width:980px;margin:0 auto}
-  header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
-  h1{font-size:26px;margin:0;letter-spacing:-.4px}
-  .sub{color:var(--mut);font-size:14px}
-  .crew{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 26px}
+  body{margin:0;color:var(--txt);position:relative;overflow-x:hidden;
+       background:linear-gradient(165deg,#252939 0%, var(--bg) 46%, #181a26 100%);
+       font:15.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased;padding:30px 18px 90px}
+  /* Atmosphäre */
+  .sun{position:fixed;z-index:0;border-radius:50%;width:min(56vw,560px);aspect-ratio:1;
+       right:-12vw;top:-16vw;filter:blur(2px);animation:breathe 9s ease-in-out infinite;
+       background:radial-gradient(circle,var(--vermilion) 0%,#b5281f 38%,rgba(120,24,18,0) 70%)}
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.04);opacity:1}}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.035;mix-blend-mode:overlay}
+  .rail{position:fixed;top:0;left:max(10px,1.4vw);height:100vh;z-index:1;display:flex;
+        flex-direction:column;justify-content:space-between;padding:28px 0;pointer-events:none}
+  .rail span{writing-mode:vertical-rl;font-family:var(--serif);letter-spacing:.3em;font-size:13px;color:var(--paper-soft);opacity:.6}
+  .rail .big{font-size:30px;color:var(--vermilion);opacity:.85;font-weight:700}
+  @media(max-width:900px){.rail{display:none}}
+
+  .wrap{max-width:1000px;margin:0 auto;position:relative;z-index:2}
+  header.top{margin-bottom:6px}
+  .eyebrow{font-family:var(--serif);font-size:13px;letter-spacing:.36em;text-transform:uppercase;
+           color:var(--gold);font-weight:600;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .eyebrow::before{content:"";width:38px;height:1px;background:var(--gold);opacity:.7}
+  h1{font-family:var(--serif);font-weight:800;font-size:clamp(30px,5.4vw,52px);margin:0;line-height:.96;letter-spacing:-.01em}
+  h1 .jp{color:var(--vermilion)}
+  .sub{color:var(--paper-soft);font-size:15px;font-family:var(--serif);margin-top:8px;display:block}
+  .crew{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 30px}
   .chip{background:var(--card2);border:1px solid var(--line);border-radius:999px;
-        padding:5px 12px;font-size:13px;color:var(--txt)}
-  .chip.miss{color:var(--mut);opacity:.55;border-style:dashed}
+        padding:6px 14px;font-size:13.5px;color:var(--txt);font-family:var(--serif)}
+  .chip.miss{color:var(--mut);opacity:.5;border-style:dashed}
   .chip b{color:var(--acc2)}
-  section{background:var(--card);border:1px solid var(--line);border-radius:18px;
-          padding:20px 22px;margin-bottom:18px;box-shadow:0 10px 40px -20px #000}
-  h2{font-size:17px;margin:0 0 16px;display:flex;align-items:center;gap:8px}
-  h2 .tag{font-size:12px;color:var(--mut);font-weight:400;margin-left:auto}
-  .row{display:flex;align-items:center;gap:12px;margin:9px 0}
+  section{background:linear-gradient(180deg,var(--card),#1e2233);border:1px solid var(--line);border-radius:16px;
+          padding:24px 26px;margin-bottom:18px;box-shadow:0 18px 50px -28px #000;position:relative;overflow:hidden}
+  section::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--vermilion),var(--gold));opacity:.8}
+  h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 20px;display:flex;align-items:center;gap:10px;letter-spacing:.01em}
+  h2 .tag{font-size:12.5px;color:var(--paper-soft);font-weight:400;font-family:var(--sans);margin-left:auto;letter-spacing:.02em}
+  .row{display:flex;align-items:center;gap:14px;margin:11px 0}
   .row .lbl{flex:0 0 auto;min-width:0}
-  .row .lbl .name{font-size:14px}
-  .row .lbl .sub{font-size:11.5px;color:var(--mut)}
-  .bar{flex:1;height:10px;background:#0c0e1a;border-radius:6px;overflow:hidden;position:relative;border:1px solid var(--line)}
-  .bar > i{display:block;height:100%;border-radius:6px;
-           background:linear-gradient(90deg,var(--acc),var(--acc2))}
-  .val{flex:0 0 auto;font-variant-numeric:tabular-nums;color:var(--mut);font-size:12.5px;min-width:64px;text-align:right}
-  .fire{color:var(--acc);font-size:12px}
-  .rank{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;margin:6px 0;background:var(--card2);border:1px solid var(--line)}
-  .rank .pos{font-size:18px;font-weight:700;color:var(--acc2);min-width:34px;text-align:center}
-  .rank .meta{margin-left:auto;text-align:right;font-size:12px;color:var(--mut);white-space:nowrap}
-  .rank .meta b{color:var(--txt);font-size:15px}
-  .rank.top1{background:linear-gradient(90deg,#2a1f2e,var(--card2));border-color:#5a2a44}
+  .row .lbl .name{font-size:15px;font-family:var(--serif);font-weight:600}
+  .row .lbl .sub{font-size:12px;color:var(--paper-soft)}
+  .bar{flex:1;height:12px;background:#14172680;border-radius:7px;overflow:hidden;position:relative;border:1px solid var(--line)}
+  .bar > i{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,var(--vermilion),var(--gold))}
+  .val{flex:0 0 auto;font-variant-numeric:tabular-nums;color:var(--gold);font-size:13.5px;min-width:66px;text-align:right;font-family:var(--serif);font-weight:600}
+  .fire{color:var(--vermilion);font-size:12.5px}
+  .rank{display:flex;gap:14px;align-items:center;padding:12px 14px;border-radius:12px;margin:7px 0;background:#252a4080;border:1px solid var(--line)}
+  .rank .pos{font-family:var(--serif);font-size:22px;font-weight:800;color:var(--vermilion);min-width:36px;text-align:center}
+  .rank .meta{margin-left:auto;text-align:right;font-size:12.5px;color:var(--paper-soft);white-space:nowrap}
+  .rank .meta b{color:var(--txt);font-size:16px;font-family:var(--serif)}
+  .rank.top1{background:linear-gradient(90deg,rgba(240,70,52,.16),#252a40);border-color:rgba(240,70,52,.5);box-shadow:0 0 26px -10px var(--vermilion) inset}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media(max-width:680px){.grid2{grid-template-columns:1fr}}
   .vs{display:flex;align-items:stretch;gap:6px;margin:12px 0}
-  .vs .opt{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
-  .vs .opt .ic{font-size:22px}
-  .vs .opt .t{font-size:12.5px;color:var(--mut);margin:2px 0 8px}
-  .vs .opt .n{font-size:20px;font-weight:700}
-  .vs .opt.win{border-color:var(--acc);background:#241a26}
-  .vs .opt.win .n{color:var(--acc2)}
-  .vs .q{flex:0 0 130px;display:flex;align-items:center;font-size:13px;color:var(--mut)}
+  .vs .opt{flex:1;background:#252a4080;border:1px solid var(--line);border-radius:12px;padding:12px 10px;text-align:center}
+  .vs .opt .ic{font-size:24px}
+  .vs .opt .t{font-size:12.5px;color:var(--paper-soft);margin:4px 0 8px}
+  .vs .opt .n{font-size:24px;font-weight:800;font-family:var(--serif)}
+  .vs .opt.win{border-color:var(--vermilion);background:rgba(240,70,52,.12)}
+  .vs .opt.win .n{color:var(--gold)}
+  .vs .q{flex:0 0 130px;display:flex;align-items:center;font-size:13.5px;color:var(--paper-soft);font-family:var(--serif)}
   @media(max-width:680px){.vs{flex-wrap:wrap}.vs .q{flex-basis:100%}}
   .pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:8px;
         padding:3px 9px;margin:3px 4px 3px 0;font-size:12.5px}
-  .person{margin:0 0 14px;padding:0 0 12px;border-bottom:1px dashed var(--line)}
+  .person{margin:0 0 16px;padding:0 0 14px;border-bottom:1px dashed var(--line)}
   .person:last-child{border:0;margin-bottom:0;padding-bottom:0}
-  .person .pn{font-weight:600;color:var(--acc2);margin-bottom:4px}
-  .person .qa{font-size:13.5px;margin:3px 0}
-  .person .qa b{color:var(--mut);font-weight:500}
-  .empty{color:var(--mut);text-align:center;padding:30px;font-style:italic}
-  .konsens .item{display:flex;align-items:center;gap:8px;font-size:13.5px;margin:5px 0}
+  .person .pn{font-family:var(--serif);font-weight:700;color:var(--gold);margin-bottom:6px;font-size:16px}
+  .person .qa{font-size:14px;margin:4px 0}
+  .person .qa b{color:var(--paper-soft);font-weight:500}
+  .empty{color:var(--paper-soft);text-align:center;padding:30px;font-style:italic;font-family:var(--serif)}
+  .konsens .item{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0}
   .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
-  footer{color:var(--mut);font-size:12px;text-align:center;margin-top:30px}
-  details summary{cursor:pointer;color:var(--mut);font-size:12px}
+  footer{color:var(--paper-soft);font-size:13px;text-align:center;margin-top:34px;font-family:var(--serif);letter-spacing:.04em}
+  details summary{cursor:pointer;color:var(--paper-soft);font-size:12.5px}
 </style>
 </head>
 <body>
+  <div class="sun"></div>
+  <svg class="grain"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#g)"/></svg>
+  <div class="rail"><span class="big">結果</span><span>クルー・アンケート ・ 二〇二六</span></div>
 <div class="wrap">
   <header class="top">
-    <h1>🇯🇵 Japan 2026 – Stimmungs-Auswertung</h1>
+    <div class="eyebrow">クルー・アンケート — Stimmungsbild</div>
+    <h1><span class="jp">結果</span> · Was die Crew will</h1>
     <span class="sub" id="meta">– lädt –</span>
   </header>
   <div class="crew" id="crew"></div>
