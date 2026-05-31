@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🇯🇵 Japan 2026 – Umfrage-Auswertung</title>
+<style>
+  :root{
+    --bg:#0e0f1a; --card:#171a2b; --card2:#1f2338; --line:#2c3150;
+    --txt:#eef0fb; --mut:#9aa0c4; --acc:#ff4d6d; --acc2:#ffd166;
+    --good:#4ade80; --warn:#fb923c; --bad:#f87171; --blue:#60a5fa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#1b1f38 0%,var(--bg) 60%);
+       color:var(--txt);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+       -webkit-font-smoothing:antialiased;padding:24px 16px 80px}
+  .wrap{max-width:980px;margin:0 auto}
+  header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  h1{font-size:26px;margin:0;letter-spacing:-.4px}
+  .sub{color:var(--mut);font-size:14px}
+  .crew{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 26px}
+  .chip{background:var(--card2);border:1px solid var(--line);border-radius:999px;
+        padding:5px 12px;font-size:13px;color:var(--txt)}
+  .chip.miss{color:var(--mut);opacity:.55;border-style:dashed}
+  .chip b{color:var(--acc2)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:18px;
+          padding:20px 22px;margin-bottom:18px;box-shadow:0 10px 40px -20px #000}
+  h2{font-size:17px;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+  h2 .tag{font-size:12px;color:var(--mut);font-weight:400;margin-left:auto}
+  .row{display:flex;align-items:center;gap:12px;margin:9px 0}
+  .row .lbl{flex:0 0 auto;min-width:0}
+  .row .lbl .name{font-size:14px}
+  .row .lbl .sub{font-size:11.5px;color:var(--mut)}
+  .bar{flex:1;height:10px;background:#0c0e1a;border-radius:6px;overflow:hidden;position:relative;border:1px solid var(--line)}
+  .bar > i{display:block;height:100%;border-radius:6px;
+           background:linear-gradient(90deg,var(--acc),var(--acc2))}
+  .val{flex:0 0 auto;font-variant-numeric:tabular-nums;color:var(--mut);font-size:12.5px;min-width:64px;text-align:right}
+  .fire{color:var(--acc);font-size:12px}
+  .rank{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;margin:6px 0;background:var(--card2);border:1px solid var(--line)}
+  .rank .pos{font-size:18px;font-weight:700;color:var(--acc2);min-width:34px;text-align:center}
+  .rank .meta{margin-left:auto;text-align:right;font-size:12px;color:var(--mut);white-space:nowrap}
+  .rank .meta b{color:var(--txt);font-size:15px}
+  .rank.top1{background:linear-gradient(90deg,#2a1f2e,var(--card2));border-color:#5a2a44}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
+  .vs{display:flex;align-items:stretch;gap:6px;margin:12px 0}
+  .vs .opt{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+  .vs .opt .ic{font-size:22px}
+  .vs .opt .t{font-size:12.5px;color:var(--mut);margin:2px 0 8px}
+  .vs .opt .n{font-size:20px;font-weight:700}
+  .vs .opt.win{border-color:var(--acc);background:#241a26}
+  .vs .opt.win .n{color:var(--acc2)}
+  .vs .q{flex:0 0 130px;display:flex;align-items:center;font-size:13px;color:var(--mut)}
+  @media(max-width:680px){.vs{flex-wrap:wrap}.vs .q{flex-basis:100%}}
+  .pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:8px;
+        padding:3px 9px;margin:3px 4px 3px 0;font-size:12.5px}
+  .person{margin:0 0 14px;padding:0 0 12px;border-bottom:1px dashed var(--line)}
+  .person:last-child{border:0;margin-bottom:0;padding-bottom:0}
+  .person .pn{font-weight:600;color:var(--acc2);margin-bottom:4px}
+  .person .qa{font-size:13.5px;margin:3px 0}
+  .person .qa b{color:var(--mut);font-weight:500}
+  .empty{color:var(--mut);text-align:center;padding:30px;font-style:italic}
+  .konsens .item{display:flex;align-items:center;gap:8px;font-size:13.5px;margin:5px 0}
+  .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+  footer{color:var(--mut);font-size:12px;text-align:center;margin-top:30px}
+  details summary{cursor:pointer;color:var(--mut);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>🇯🇵 Japan 2026 – Stimmungs-Auswertung</h1>
+    <span class="sub" id="meta">– lädt –</span>
+  </header>
+  <div class="crew" id="crew"></div>
+
+  <div id="content"></div>
+
+  <footer>
+    Auto-generiert aus den eingesendeten <code>JP26-</code>-Codes · self-contained ·
+    <details style="display:inline-block;margin-left:6px"><summary>Roh-Codes</summary>
+      <div id="rawdump" style="text-align:left;max-width:600px;margin:8px auto;font-family:monospace;font-size:10px;color:var(--mut);word-break:break-all"></div>
+    </details>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   QUELLE DER WAHRHEIT: eingesendete Codes (einer pro Eintrag).
+   Neuen Code aufnehmen = String unten in RAW_CODES ergänzen.
+   ============================================================ */
+const RAW_CODES = [
+  "JP26-eyJ2IjoyLCJuYW1lIjoiTWF0cyIsInMiOnsia3VsdHVyIjozLCJhY3Rpb24iOjcsIm5pZ2h0Ijo4LCJmb29kIjo5LCJjaGlsbCI6OCwibmVyZCI6M30sImMiOnsiYzEiOiJiIiwiYzIiOiJhIiwiYzMiOiJiIiwiYzQiOm51bGwsImM1IjoiYiIsImM2IjoiYiJ9LCJ3Ijp7InNoaWJ1eWEiOjEsInNreXRvd2VyIjoxLCJzaGluanVrdSI6MiwiYWtpYmEiOjEsImFzYWt1c2EiOjIsInNob3BwaW5nIjoxLCJvZGFpYmEiOjIsIm1laWppIjoyLCJraW5rYWt1IjoxLCJzdXNoaSI6MiwicmFtZW4iOjEsIndhZ3l1IjoyLCJpemFrYXlhIjoyLCJrYWl0ZW4iOjMsInNha2UiOjMsImZ1amkiOjIsImthd2FndWNoaSI6MiwiYmVhY2giOjMsImthbWFrdXJhIjoxLCJuaWtrbyI6MSwidGVhbWxhYiI6MiwiYXJjYWRlIjoxLCJzdW1vIjoxLCJiYXJob3AiOjEsImdvbGRlbmdhaSI6MX0sImlkZWFzIjp7InRva3lvIjoibWF5bmJlIGF1Y2ggZGllc2VyIHNwb3Qgd28gbWFuIGluIHRva3lvIGltbWVyIGdldHVudGUgc3V0b3Mgc2llaHQuLnVuZCBkaWUgbW9tIHZvbiBuZW0ga29sbGVnbiBoYXQgdW5zIGVtcGZvaGxlbiBpcmdlbmR3byBnaWJ0IGVzIG5lIHN0cmHDn2VtbmFobmxpbmllIHdvIGRpZSBkYW5ubiBpcmdlbmR3aWUgc28gaW0gZnJlaWVuIGbDpGhydCB1bmQgbWFuIGlyZ2VuZHdpZSBzb3p1c2FnZW4gZWluZSBmcmVpaGVpdHNzdGF0dWUgb2RlciBzbyBzZWhlbiBrYW5uIHVuZCBnYW56IGlubmRlciBuw6RoZSBtaWVudGUgc2llIGdpYnQgZXMgYXVjaCBub2NoIG5lbiBncm/Dn2VzIGdlYsOkdWRlIG1pdCBuZXIgdHJlcHBlIHdvIG1hbiBmb3IgZnJlZSBob2NoZmFocmVuIGthbm4uLiBhbnNvbnNvbnRlbiB2bGx0IGF1Y2ggYmlzc2NoZW4genVtIHN0YWR0dCBlcmt1bmRlbiBzbyBwYWFyIGtsZWdlbmTDpHJlIHNlY3JldCBzcG90cyBhdXMgYW5pbWVzIG9kZXIgZmlsbSB1bmQgZmVybnNlaGVuIGVya3VuZGVuIiwia3VsdHVyIjoiaXJnZW5kd2VsY2hlIGdlaWxlbiBrbGllbmVuIHZlcnN0ZWNrdGVuIHZpYmV5IHNwb3RzIGVudGRlY2tlbi4uIHZsbHQgZGVuIDQgdGFnZXMgYXV0byByb2FkdHJpcCBhdXNudXR6ZW4gdW0gZGEgc28ga2xlaW5lIGFic3RlY2hlciB1bSBkZW4gZnVqaSBydW0gb2RlciBzbyJ9LCJ0MSI6Im5hY2h0cyBkdXJ2Y2ggdG9reW8gb2huZSBwbGFuIG1pdCBzdHJvbWcgemVybyAiLCJ0MiI6IiIsInQzIjoiIn0=",
+  "JP26-eyJ2IjoyLCJuYW1lIjoiTWFya28iLCJzIjp7Imt1bHR1ciI6NSwiYWN0aW9uIjo1LCJuaWdodCI6NiwiZm9vZCI6NywiY2hpbGwiOjgsIm5lcmQiOjh9LCJjIjp7ImMxIjoiYiIsImMyIjoiYSIsImMzIjoiYSIsImM0IjoiYSIsImM1IjoiYSIsImM2IjoiYiIsImM3IjoiYiJ9LCJ3Ijp7InNoaWJ1eWEiOjIsInNreXRvd2VyIjoyLCJzaGluanVrdSI6MSwiYWtpYmEiOjIsImhhcmFqdWt1IjoxLCJhc2FrdXNhIjoyLCJvZGFpYmEiOjMsInNob3BwaW5nIjoxLCJmdXNoaW1pIjoyLCJuYXJhIjozLCJiYW1ib28iOjAsImtpbmtha3UiOjEsImNhc3RsZSI6MSwibWVpamkiOjIsInJ5b2thbiI6Mywid2FneXUiOjEsIml6YWtheWEiOjIsImthaXRlbiI6MSwic2FrZSI6Mywic3VzaGkiOjEsInJhbWVuIjoyLCJmdWppIjoyLCJrYXdhZ3VjaGkiOjEsImJlYWNoIjozLCJmdWppY2xpbWIiOjIsIm5pa2tvIjoxLCJ0ZWFtbGFiIjozLCJnb2thcnQiOjIsInN1bW8iOjEsInVzaiI6MSwidnIiOjEsImFyY2FkZSI6MSwia2FyYW9rZSI6MywiZ29sZGVuZ2FpIjoyLCJyb2JvdCI6MSwicGFjaGlua28iOjF9LCJpZGVhcyI6e30sInQxIjoiRnVqaSBiZXN0ZWlnZW4gIiwidDIiOiJNYXRzIHVuZ2V3YXNjaGVuZSBGw7zDn2UgZXJsZWJlbiAiLCJ0MyI6IiJ9",
+  "JP26-eyJ2IjoyLCJuYW1lIjoiSGVuZHJpayIsInMiOnsiZm9vZCI6MTAsImFjdGlvbiI6MTAsImt1bHR1ciI6NSwibmlnaHQiOjcsImNoaWxsIjoxMCwibmVyZCI6MTB9LCJjIjp7ImMxIjoiYiIsImMyIjoiYiIsImMzIjoiYSIsImM0IjoiYSIsImM1IjoiYSIsImM3IjoiYSJ9LCJ3Ijp7InNoaWJ1eWEiOjMsInNreXRvd2VyIjoyLCJzaGluanVrdSI6MiwiYWtpYmEiOjMsImhhcmFqdWt1IjoyLCJhc2FrdXNhIjoyLCJzaG9wcGluZyI6Miwib2RhaWJhIjoyLCJmdXNoaW1pIjoxLCJuYXJhIjozLCJiYW1ib28iOjEsImtpeW9taXp1IjoyLCJraW5rYWt1IjoyLCJjYXN0bGUiOjEsIm1laWppIjoyLCJ5dWthdGEiOjEsInJ5b2thbiI6MSwic3VzaGkiOjMsInJhbWVuIjoxLCJ3YWd5dSI6Mywic3RyZWV0IjoxLCJpemFrYXlhIjoyLCJjb25iaW5pIjozLCJrYWl0ZW4iOjIsInNha2UiOjMsImNhZmUiOjMsImZ1amkiOjMsImthd2FndWNoaSI6Mywib25zZW4iOjEsImJlYWNoIjoyLCJrYW1ha3VyYSI6MiwiaGFrb25lIjoxLCJuaWtrbyI6MSwiZnVqaWNsaW1iIjozLCJ1c2oiOjMsInRlYW1sYWIiOjEsImFyY2FkZSI6MiwiYmFzZWJhbGwiOjIsIm5pbnRlbiI6Miwic3VtbyI6MiwidnIiOjMsImthcmFva2UiOjMsImJhcmhvcCI6MSwiY2x1YiI6MSwiZ29sZGVuZ2FpIjoyLCJyb2JvdCI6MiwicGFjaGlua28iOjJ9LCJpZGVhcyI6eyJ0b2t5byI6IlBhZ29kZSBNdC4gRnVqaSAoV2FsZHdlZyB6dSBGdcOfIGVycmVpY2hiYXIgbWl0IGJhYmEgQXVzc2ljaHQpIn0sInQxIjoiTmFjaHRzIGFtIFNreXRyZWUgY2hpbGxlbiB1bmQgRW1yZSBlaW5lIHdlYnVudGlzIHBlcmMgcG9wcGVuIGxhc3NlbiIsInQyIjoiIiwidDMiOiJJbiBlaW5lbiBWaW50YWdlIFVocmVuLUxhZGVuIGdlaGVuIn0=",
+  "JP26-eyJ2IjoyLCJuYW1lIjoiRW1yZSIsInMiOnsiZm9vZCI6Nywia3VsdHVyIjo5LCJhY3Rpb24iOjcsIm5pZ2h0IjoyLCJjaGlsbCI6OSwibmVyZCI6OH0sImMiOnsiYzEiOiJhIiwiYzIiOiJhIiwiYzMiOiJhIiwiYzQiOiJhIiwiYzUiOiJiIiwiYzYiOiJiIiwiYzciOiJhIn0sInciOnsic2t5dG93ZXIiOjMsInNoaW5qdWt1IjoxLCJha2liYSI6MSwic2hpYnV5YSI6MiwiaGFyYWp1a3UiOjEsImFzYWt1c2EiOjIsInNob3BwaW5nIjoxLCJvZGFpYmEiOjIsImZ1c2hpbWkiOjEsIm5hcmEiOjMsImJhbWJvbyI6MSwia2l5b21penUiOjIsImtpbmtha3UiOjEsImNhc3RsZSI6MSwibWVpamkiOjEsInJ5b2thbiI6Miwic3VzaGkiOjMsInJhbWVuIjoxLCJ3YWd5dSI6Miwia2FpdGVuIjozLCJzYWtlIjozLCJmdWppIjozLCJrYXdhZ3VjaGkiOjIsImthbWFrdXJhIjoyLCJoYWtvbmUiOjIsIm5pa2tvIjoxLCJmdWppY2xpbWIiOjEsInRlYW1sYWIiOjEsImdva2FydCI6MiwiYXJjYWRlIjoxLCJ1c2oiOjEsIm5pbnRlbiI6Mywia2FyYW9rZSI6MX0sImlkZWFzIjp7fSwidDEiOiIiLCJ0MiI6IiIsInQzIjoiIn0=",
+  "JP26-eyJ2IjoyLCJuYW1lIjoiQ3Jpc3RvYmFsIiwicyI6eyJhY3Rpb24iOjMsImZvb2QiOjEwLCJuaWdodCI6NywibmVyZCI6OCwia3VsdHVyIjo3LCJjaGlsbCI6OH0sImMiOnsiYzEiOiJhIiwiYzIiOiJiIiwiYzMiOiJhIiwiYzQiOiJiIiwiYzUiOiJiIiwiYzYiOiJhIiwiYzciOiJiIn0sInciOnsic2hpYnV5YSI6Miwic2t5dG93ZXIiOjEsInNoaW5qdWt1IjoxLCJhc2FrdXNhIjoyLCJha2liYSI6MiwiaGFyYWp1a3UiOjEsInNob3BwaW5nIjoxLCJvZGFpYmEiOjEsImZ1c2hpbWkiOjIsIm5hcmEiOjIsImJhbWJvbyI6Miwia2l5b21penUiOjEsImtpbmtha3UiOjEsImNhc3RsZSI6MiwibWVpamkiOjEsInJ5b2thbiI6MSwicmFtZW4iOjMsInN1c2hpIjoyLCJ3YWd5dSI6MiwiaXpha2F5YSI6MSwic3RyZWV0IjoxLCJmdWppIjozLCJrYXdhZ3VjaGkiOjEsImJlYWNoIjoxLCJuaWtrbyI6MSwiZnVqaWNsaW1iIjoyLCJ1c2oiOjIsInRlYW1sYWIiOjEsImFyY2FkZSI6MSwibmludGVuIjozLCJzdW1vIjoxLCJrYXJhb2tlIjoyLCJiYXJob3AiOjIsImdvbGRlbmdhaSI6MSwiY2x1YiI6MX0sImlkZWFzIjp7ImZvb2QiOiJTdGVybmVrw7xjaGUiLCJmdW4iOiJUb2t5byBKdW1ibyBHb2xmIENlbnRlciIsIm5hdHVyIjoiQmVsaWNodHVuZyBlaW5lciBUZWVwbGFudGFnZSJ9LCJ0MSI6IkdlaWxlcyBlc3NlbiBSYW1lbiwgU3RyZWV0Zm9vZCBldGMuICIsInQyIjoiTW9yZ2VucyA1IFN0dW5kZW4gYWxsZWluZSBXYWNoIiwidDMiOiIifQ==",
+  "JP26-eyJ2IjoyLCJuYW1lIjoiU2ViYXN0aWFuIiwicyI6eyJmb29kIjo4LCJjaGlsbCI6OCwibmlnaHQiOjYsImt1bHR1ciI6NywiYWN0aW9uIjo3LCJuZXJkIjo3fSwiYyI6eyJjMSI6ImEiLCJjMiI6ImEiLCJjMyI6ImEiLCJjNCI6ImEiLCJjNiI6ImEiLCJjNyI6ImIifSwidyI6eyJzaGluanVrdSI6Mywic2t5dG93ZXIiOjIsInNoaWJ1eWEiOjEsImFraWJhIjoyLCJoYXJhanVrdSI6MSwib2RhaWJhIjoyLCJhc2FrdXNhIjoxLCJuYXJhIjozLCJiYW1ib28iOjEsImtpeW9taXp1IjozLCJraW5rYWt1IjoyLCJjYXN0bGUiOjIsIm1laWppIjowLCJyeW9rYW4iOjEsInN1c2hpIjoyLCJyYW1lbiI6Miwid2FneXUiOjIsIml6YWtheWEiOjIsImNvbmJpbmkiOjEsImthaXRlbiI6Miwic2FrZSI6MiwiY2FmZSI6MSwiZnVqaSI6Mywia2F3YWd1Y2hpIjozLCJvbnNlbiI6MiwiYmVhY2giOjIsImthbWFrdXJhIjoyLCJoYWtvbmUiOjIsIm5pa2tvIjoyLCJmdWppY2xpbWIiOjEsInRlYW1sYWIiOjEsImdva2FydCI6MSwiYXJjYWRlIjowLCJuaW50ZW4iOjIsInN1bW8iOjEsInZyIjoxLCJrYXJhb2tlIjozLCJiYXJob3AiOjIsImNsdWIiOjEsImdvbGRlbmdhaSI6MCwicm9ib3QiOjEsInBhY2hpbmtvIjoyfSwiaWRlYXMiOnsidG9reW8iOiJVbWVkYSBza3kgYnVpbGRpbmcgb3Nha2EiLCJrdWx0dXIiOiJTdWdhIHNocmluZSAodG9raW8pOyBidXJnIG5pam8ga3lvdG8iLCJmb29kIjoiR29vZnkganVpY2UgYXV0b21hdGVuIHZlcmtvc3R1bmcg8J+UpSJ9LCJ0MSI6IkJlc3VjaCBpbiBkZXIgMjQvNyB3w6RzY2hlcmVpIiwidDIiOiJVcmxhdWIgMTAwJSBkdXJjaHRha3RlbiIsInQzIjoiIn0=",
+];
+
+const CREW = ["Mats","Sebastian","Marko","Emre","Hendrik","Cristobal"];
+
+/* --- Schema-Labels (synchron mit Umfrage-HTML) --- */
+const VIBES = [
+  {k:"kultur", l:"⛩️ Kultur & Geschichte"},
+  {k:"action", l:"⚡ Action & Adrenalin"},
+  {k:"night",  l:"🍻 Nightlife & Feiern"},
+  {k:"food",   l:"🍜 Essen & Genuss"},
+  {k:"chill",  l:"♨️ Natur & Entspannung"},
+  {k:"nerd",   l:"🎮 Anime, Gaming & Tech"},
+];
+const CHOICES = [
+  {k:"c1", q:"Was zieht dich mehr?",      a:{ic:"⛩️",t:"Tempel"},               b:{ic:"🗼",t:"Tower / Skyline"}},
+  {k:"c2", q:"Beim Essen lieber…",        a:{ic:"🍜",t:"Ramen-Bude"},           b:{ic:"🍽️",t:"Fine Dining"}},
+  {k:"c3", q:"Der perfekte Morgen?",      a:{ic:"🌅",t:"Sonnenaufgang am Fuji"}, b:{ic:"😴",t:"Ausschlafen"}},
+  {k:"c4", q:"Abends eher…",              a:{ic:"🎤",t:"Karaoke"},              b:{ic:"🍸",t:"Bar-Hopping"}},
+  {k:"c5", q:"Wie sollen die Tage sein?", a:{ic:"⚡",t:"Vollgepackt"},           b:{ic:"🌿",t:"Entspannt"}},
+  {k:"c6", q:"Dein Rhythmus?",            a:{ic:"🐓",t:"Frühaufsteher"},         b:{ic:"🦉",t:"Nachteule"}},
+  {k:"c7", q:"Reise-Stil?",               a:{ic:"🗺️",t:"Lieber geplant"},       b:{ic:"🎲",t:"Spontan"}},
+];
+const GROUPS = [
+  {key:"tokyo", t:"🗼 Tokyo & Stadt-Vibes", items:[
+    {k:"shibuya",l:"Shibuya Crossing & Shibuya Sky"},{k:"skytower",l:"Tokyo Skytree / Tokyo Tower"},
+    {k:"shinjuku",l:"Shinjuku bei Nacht"},{k:"akiba",l:"Akihabara"},{k:"harajuku",l:"Harajuku & Takeshita-Street"},
+    {k:"asakusa",l:"Asakusa & Sensō-ji"},{k:"shopping",l:"Mega-Shopping"},{k:"odaiba",l:"Odaiba"},
+  ]},
+  {key:"kultur", t:"⛩️ Kultur & Klassiker", items:[
+    {k:"fushimi",l:"Fushimi Inari – die roten Tore"},{k:"nara",l:"Nara – die zahmen Rehe"},
+    {k:"bamboo",l:"Arashiyama Bambuswald"},{k:"kiyomizu",l:"Kiyomizu-dera"},{k:"kinkaku",l:"Goldener Pavillon"},
+    {k:"castle",l:"Japanische Burg"},{k:"meiji",l:"Meiji-Schrein"},{k:"yukata",l:"Kimono / Yukata tragen"},
+    {k:"ryokan",l:"Nacht im Ryokan"},
+  ]},
+  {key:"food", t:"🍜 Essen & Trinken", items:[
+    {k:"sushi",l:"Sushi am Fischmarkt"},{k:"ramen",l:"Ramen-Tour"},{k:"wagyu",l:"Wagyu / Kobe-Beef"},
+    {k:"street",l:"Street Food in Osaka"},{k:"izakaya",l:"Izakaya-Abend"},{k:"conbini",l:"Conbini-Gourmet"},
+    {k:"kaiten",l:"Förderband-Sushi"},{k:"sake",l:"Sake / Strong Zero"},{k:"cafe",l:"Themen-Café"},
+  ]},
+  {key:"natur", t:"🏞️ Natur & Tagesausflüge", items:[
+    {k:"fuji",l:"Mt. Fuji sehen"},{k:"kawaguchi",l:"Lake Kawaguchiko"},{k:"onsen",l:"Onsen-Bad"},
+    {k:"beach",l:"Strand & Pazifik (Izu)"},{k:"kamakura",l:"Kamakura"},{k:"hakone",l:"Hakone"},
+    {k:"nikko",l:"Nikko"},{k:"fujiclimb",l:"Fuji besteigen"},
+  ]},
+  {key:"fun", t:"🎮 Nerd, Fun & Action", items:[
+    {k:"usj",l:"Universal Studios / Nintendo World"},{k:"teamlab",l:"teamLab"},{k:"gokart",l:"Mario-Kart Stadt"},
+    {k:"arcade",l:"Spielhallen / Arcades"},{k:"baseball",l:"Baseball-Spiel live"},{k:"ninten",l:"Nintendo Museum"},
+    {k:"sumo",l:"Sumo erleben"},{k:"vr",l:"VR / Action-Park"},
+  ]},
+  {key:"night", t:"🌃 Nightlife", items:[
+    {k:"karaoke",l:"Karaoke"},{k:"barhop",l:"Bar-Hopping"},{k:"club",l:"Club / Techno"},
+    {k:"goldengai",l:"Golden Gai"},{k:"robot",l:"Themen- / Robot-Bars"},{k:"pachinko",l:"Pachinko"},
+  ]},
+];
+const W_LABEL = ["egal","nice","will ich","UNBEDINGT 🔥"];
+const ALL_ITEMS = GROUPS.flatMap(g=>g.items.map(it=>({...it,group:g.t})));
+const ITEM_LBL = Object.fromEntries(ALL_ITEMS.map(it=>[it.k,it.l]));
+
+/* --- Decode --- */
+function decode(code){
+  try{
+    const b = code.trim().replace(/^JP26-/,"");
+    return JSON.parse(decodeURIComponent(escape(atob(b))));
+  }catch(e){ return {__err:String(e), __raw:code}; }
+}
+const SUBS = RAW_CODES.map(decode).filter(s=>!s.__err);
+const ERRS = RAW_CODES.map(decode).filter(s=>s.__err);
+
+/* --- Render --- */
+const $ = (h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild;};
+const esc = (s)=>String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const N = SUBS.length;
+
+document.getElementById('meta').textContent =
+  N===0 ? "noch keine Codes eingetragen" : `${N} von ${CREW.length} Antworten`;
+
+// Crew chips
+const answered = new Set(SUBS.map(s=>(s.name||"").trim().toLowerCase()));
+document.getElementById('crew').innerHTML = CREW.map(n=>{
+  const got = answered.has(n.toLowerCase());
+  return `<span class="chip ${got?'':'miss'}">${got?'✅':'⏳'} ${esc(n)}</span>`;
+}).join('') + (SUBS.filter(s=>!CREW.some(c=>c.toLowerCase()===(s.name||'').trim().toLowerCase()))
+  .map(s=>`<span class="chip">✅ ${esc(s.name||'?')}</span>`).join(''));
+
+const content = document.getElementById('content');
+
+if(N===0){
+  content.innerHTML = `<section><div class="empty">Sobald der erste <code>JP26-</code>-Code eingetragen ist, erscheint hier die komplette Auswertung:<br>Vibe-Profil · Must-See-Ranking · Entweder/Oder · Konsens & Streit · Ideen & Must-Dos.</div></section>`;
+}else{
+  content.appendChild(renderVibes());
+  content.appendChild(renderRanking());
+  content.appendChild(renderChoices());
+  content.appendChild(renderKonsens());
+  content.appendChild(renderText());
+}
+
+function avg(arr){return arr.length? arr.reduce((a,b)=>a+b,0)/arr.length : 0;}
+
+function renderVibes(){
+  const sec=$(`<section><h2>🎚️ Vibe-Profil <span class="tag">Ø Begeisterung 0–10</span></h2></section>`);
+  const rows = VIBES.map(v=>{
+    const vals = SUBS.map(s=>s.s&&s.s[v.k]).filter(x=>x!=null&&x!=="");
+    return {v, a:avg(vals.map(Number)), n:vals.length};
+  }).sort((x,y)=>y.a-x.a);
+  rows.forEach(r=>{
+    sec.appendChild($(`<div class="row">
+      <div class="lbl" style="flex:0 0 200px"><div class="name">${esc(r.v.l)}</div></div>
+      <div class="bar"><i style="width:${r.a*10}%"></i></div>
+      <div class="val">${r.a.toFixed(1)} <span style="opacity:.6">/10</span></div>
+    </div>`));
+  });
+  return sec;
+}
+
+function renderRanking(){
+  const sec=$(`<section><h2>🏆 Must-See-Ranking <span class="tag">Ø Wunsch 0–3 · 🔥 = „UNBEDINGT"</span></h2></section>`);
+  const ranked = ALL_ITEMS.map(it=>{
+    const vals = SUBS.map(s=>s.w&&s.w[it.k]).filter(x=>x!=null).map(Number);
+    return {it, a:avg(vals), fire:vals.filter(x=>x===3).length, n:vals.length, sum:vals.reduce((a,b)=>a+b,0)};
+  }).filter(r=>r.n>0).sort((x,y)=> y.a-x.a || y.fire-x.fire);
+  ranked.forEach((r,i)=>{
+    const pct = (r.a/3)*100;
+    sec.appendChild($(`<div class="rank ${i===0?'top1':''}">
+      <div class="pos">${i+1}</div>
+      <div class="lbl"><div class="name">${esc(r.it.l)}</div><div class="sub">${esc(r.it.group)}</div></div>
+      <div class="bar" style="flex:0 0 120px;max-width:120px"><i style="width:${pct}%"></i></div>
+      <div class="meta"><b>${r.a.toFixed(2)}</b>/3 ${r.fire?`· <span class="fire">${r.fire}× 🔥</span>`:''}</div>
+    </div>`));
+  });
+  return sec;
+}
+
+function renderChoices(){
+  const sec=$(`<section><h2>⚖️ Entweder / Oder</h2><div class="grid2" id="choicegrid"></div></section>`);
+  const grid=sec.querySelector('#choicegrid');
+  CHOICES.forEach(c=>{
+    const a=SUBS.filter(s=>s.c&&s.c[c.k]==='a').length;
+    const b=SUBS.filter(s=>s.c&&s.c[c.k]==='b').length;
+    grid.appendChild($(`<div class="vs" style="flex-direction:column;gap:6px">
+      <div style="font-size:12.5px;color:var(--mut)">${esc(c.q)}</div>
+      <div style="display:flex;gap:6px">
+        <div class="opt ${a>=b?'win':''}"><div class="ic">${c.a.ic}</div><div class="t">${esc(c.a.t)}</div><div class="n">${a}</div></div>
+        <div class="opt ${b>a?'win':''}"><div class="ic">${c.b.ic}</div><div class="t">${esc(c.b.t)}</div><div class="n">${b}</div></div>
+      </div>
+    </div>`));
+  });
+  return sec;
+}
+
+function renderKonsens(){
+  const sec=$(`<section><h2>🤝 Konsens & 💥 Streitthemen</h2><div class="grid2"></div></section>`);
+  const grid=sec.querySelector('.grid2');
+  const stats = ALL_ITEMS.map(it=>{
+    const vals = SUBS.map(s=>s.w&&s.w[it.k]).filter(x=>x!=null).map(Number);
+    if(vals.length<Math.max(2,Math.ceil(N*0.6))) return null;
+    const m=avg(vals);
+    const variance=avg(vals.map(v=>(v-m)**2));
+    return {it,m,variance,min:Math.min(...vals),max:Math.max(...vals)};
+  }).filter(Boolean);
+  const consensus = stats.filter(s=>s.m>=2 && s.variance<=0.35).sort((a,b)=>b.m-a.m).slice(0,8);
+  const strife = stats.filter(s=>s.variance>=0.9).sort((a,b)=>b.variance-a.variance).slice(0,8);
+  const colA=$(`<div><div style="font-size:13px;color:var(--good);margin-bottom:8px;font-weight:600">✅ Alle wollen (Selbstläufer)</div></div>`);
+  consensus.forEach(s=>colA.appendChild($(`<div class="item"><span class="dot" style="background:var(--good)"></span>${esc(s.it.l)} <span style="color:var(--mut);margin-left:auto;font-size:12px">Ø${s.m.toFixed(1)}</span></div>`)));
+  if(!consensus.length)colA.appendChild($(`<div class="empty" style="padding:8px">– noch keiner –</div>`));
+  const colB=$(`<div><div style="font-size:13px;color:var(--warn);margin-bottom:8px;font-weight:600">💥 Geteilte Meinungen</div></div>`);
+  strife.forEach(s=>colB.appendChild($(`<div class="item"><span class="dot" style="background:var(--warn)"></span>${esc(s.it.l)} <span style="color:var(--mut);margin-left:auto;font-size:12px">${s.min}–${s.max}</span></div>`)));
+  if(!strife.length)colB.appendChild($(`<div class="empty" style="padding:8px">– noch keiner –</div>`));
+  grid.appendChild(colA);grid.appendChild(colB);
+  return sec;
+}
+
+function renderText(){
+  const sec=$(`<section><h2>💬 Eigene Ideen, Must-Dos & No-Gos</h2></section>`);
+  SUBS.forEach(s=>{
+    const p=$(`<div class="person"><div class="pn">${esc(s.name||'Unbekannt')}</div></div>`);
+    if(s.t1) p.appendChild($(`<div class="qa"><b>🎯 #1 Must-Do:</b> ${esc(s.t1)}</div>`));
+    if(s.t2) p.appendChild($(`<div class="qa"><b>🚫 No-Go:</b> ${esc(s.t2)}</div>`));
+    if(s.t3) p.appendChild($(`<div class="qa"><b>✨ Wunsch:</b> ${esc(s.t3)}</div>`));
+    const ideas = s.ideas&&Object.values(s.ideas).filter(x=>x&&x.trim());
+    if(ideas&&ideas.length) p.appendChild($(`<div class="qa"><b>💡 Ideen:</b> ${ideas.map(esc).join(' · ')}</div>`));
+    if(p.children.length===1) p.appendChild($(`<div class="qa" style="color:var(--mut)">– keine Freitext-Angaben –</div>`));
+    sec.appendChild(p);
+  });
+  return sec;
+}
+
+// raw dump for backup
+document.getElementById('rawdump').textContent = RAW_CODES.join('\n') || '(noch leer)';
+if(ERRS.length) document.getElementById('meta').textContent += ` ⚠️ ${ERRS.length} Code(s) fehlerhaft`;
+</script>
+</body>
+</html>
