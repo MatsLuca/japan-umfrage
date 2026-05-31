@@ -3,132 +3,259 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🇯🇵 Japan 2026 – Crew Hub</title>
+<title>日本 2026 — Crew Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Kurenaido&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0c0d16; --card:#161a2c; --line:#2a2f4d; --txt:#f0f2ff; --mut:#9aa0c4;
-    --acc:#ff4d6d; --acc2:#ffd166; --blue:#60a5fa; --good:#4ade80;
+    --ink:#0a0b12;            /* sumi ink */
+    --ink2:#11131f;
+    --paper:#efe7d6;          /* washi cream */
+    --paper-dim:#b6b0a3;
+    --vermilion:#e23b2e;      /* torii / hinomaru red */
+    --vermilion-soft:#ff5a47;
+    --gold:#d9a441;
+    --line:rgba(239,231,214,.14);
+    --serif:"Shippori Mincho B1",serif;
+    --sans:"Zen Kaku Gothic New",sans-serif;
   }
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;color:var(--txt);
-    background:
-      radial-gradient(900px 500px at 80% -5%, #2a1f3a 0%, transparent 60%),
-      radial-gradient(700px 500px at 0% 100%, #1a2540 0%, transparent 55%),
-      var(--bg);
-    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;display:flex;align-items:flex-start;justify-content:center;
-    padding:40px 18px 70px}
-  .wrap{width:100%;max-width:920px}
-  .hero{text-align:center;margin-bottom:34px}
-  .flag{font-size:46px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))}
-  h1{font-size:clamp(30px,6vw,48px);margin:6px 0 2px;letter-spacing:-1px;
-     background:linear-gradient(90deg,#fff,#ffd166);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .dates{color:var(--mut);font-size:15px;letter-spacing:.5px}
-  .count{display:flex;gap:10px;justify-content:center;margin:22px 0 8px;flex-wrap:wrap}
-  .count .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;min-width:78px}
-  .count .num{font-size:28px;font-weight:800;color:var(--acc2);font-variant-numeric:tabular-nums;line-height:1}
-  .count .unit{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-  .crew{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:18px 0 0}
-  .chip{background:#1b2038;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
-  .chip small{color:var(--mut)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:34px}
-  @media(max-width:640px){.grid{grid-template-columns:1fr}}
-  a.card{display:block;text-decoration:none;color:inherit;background:var(--card);
-    border:1px solid var(--line);border-radius:20px;padding:22px;position:relative;overflow:hidden;
-    transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
-  a.card:hover{transform:translateY(-4px);border-color:var(--acc);box-shadow:0 18px 50px -22px var(--acc)}
-  a.card .ic{font-size:34px;line-height:1}
-  a.card h2{font-size:20px;margin:12px 0 4px}
-  a.card p{color:var(--mut);font-size:13.5px;margin:0}
-  a.card .go{position:absolute;top:22px;right:22px;color:var(--mut);font-size:20px;transition:transform .15s}
-  a.card:hover .go{transform:translateX(4px);color:var(--acc2)}
-  a.card .badge{display:inline-block;margin-top:12px;font-size:11px;color:var(--good);
-    background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);border-radius:6px;padding:2px 8px}
-  .accent-uber{background:linear-gradient(135deg,#1d2236,#241a2e)}
-  .accent-tag{background:linear-gradient(135deg,#1d2236,#1a2433)}
-  footer{text-align:center;color:var(--mut);font-size:12px;margin-top:40px;line-height:1.7}
-  footer code{color:var(--blue)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink); color:var(--paper);
+    font-family:var(--sans); font-weight:400; line-height:1.6;
+    min-height:100vh; overflow-x:hidden; position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ── rising sun + atmosphere ───────────────────────── */
+  .sun{
+    position:fixed; z-index:0; border-radius:50%;
+    width:min(72vw,760px); aspect-ratio:1;
+    right:-16vw; top:-22vw;
+    background:radial-gradient(circle at 50% 50%,
+      var(--vermilion) 0%, #b5281f 38%, rgba(120,24,18,0) 70%);
+    filter:blur(2px);
+    animation:breathe 9s ease-in-out infinite;
+  }
+  .sun::after{
+    content:""; position:absolute; inset:14%;
+    border-radius:50%; border:1px solid rgba(255,120,100,.25);
+  }
+  .glow{
+    position:fixed; z-index:0; left:-20vw; bottom:-26vw;
+    width:min(80vw,820px); aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle,#1b2c52 0%, rgba(12,16,30,0) 68%);
+  }
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.92}50%{transform:scale(1.04);opacity:1}}
+
+  /* grain */
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay}
+
+  .wrap{position:relative;z-index:2;max-width:1080px;margin:0 auto;
+        padding:clamp(28px,5vw,64px) clamp(22px,5vw,56px) 64px}
+
+  /* ── vertical kanji rail ───────────────────────────── */
+  .rail{position:fixed;top:0;left:max(14px,2vw);height:100vh;z-index:2;
+        display:flex;flex-direction:column;justify-content:space-between;
+        padding:30px 0;pointer-events:none}
+  .rail span{writing-mode:vertical-rl;font-family:var(--serif);
+        letter-spacing:.35em;font-size:13px;color:var(--paper-dim);opacity:.55}
+  .rail .big{font-size:34px;color:var(--vermilion);opacity:.85;font-weight:700}
+  @media(max-width:760px){.rail{display:none}}
+
+  /* ── hero ──────────────────────────────────────────── */
+  header{padding-top:clamp(20px,7vh,72px)}
+  .eyebrow{font-family:var(--serif);font-size:13px;letter-spacing:.5em;
+           text-transform:uppercase;color:var(--gold);
+           display:flex;align-items:center;gap:14px}
+  .eyebrow::before{content:"";width:42px;height:1px;background:var(--gold);opacity:.7}
+
+  .title{font-family:var(--serif);font-weight:800;line-height:.86;
+         font-size:clamp(72px,18vw,210px);letter-spacing:-.02em;
+         margin:18px 0 0;position:relative;color:var(--paper)}
+  .title .jp{display:block;font-size:clamp(20px,4.4vw,42px);font-weight:600;
+             letter-spacing:.18em;color:var(--vermilion-soft);margin-bottom:6px}
+  .title .yr{color:var(--vermilion)}
+
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:baseline;
+        margin-top:22px;font-size:clamp(14px,1.6vw,17px);color:var(--paper-dim)}
+  .meta b{color:var(--paper);font-weight:500}
+  .route{font-family:var(--serif);letter-spacing:.04em}
+
+  /* ── countdown ─────────────────────────────────────── */
+  .count{display:flex;align-items:flex-end;gap:clamp(10px,2.4vw,30px);
+         margin:38px 0 8px;flex-wrap:wrap}
+  .count .lead{font-family:var(--serif);font-size:14px;color:var(--gold);
+        writing-mode:vertical-rl;letter-spacing:.3em;align-self:stretch;padding-top:6px}
+  .cu{display:flex;flex-direction:column}
+  .cu .n{font-family:var(--serif);font-weight:800;font-size:clamp(40px,7vw,76px);
+         line-height:.9;font-variant-numeric:tabular-nums;color:var(--paper)}
+  .cu .l{font-size:11px;letter-spacing:.34em;text-transform:uppercase;
+         color:var(--paper-dim);margin-top:8px}
+  .cu.sep .n{color:var(--vermilion)}
+
+  /* ── crew line ─────────────────────────────────────── */
+  .crew{margin-top:30px;padding-top:22px;border-top:1px solid var(--line);
+        font-size:clamp(14px,1.7vw,18px);line-height:2;color:var(--paper)}
+  .crew .k{font-family:var(--serif);color:var(--paper-dim);font-size:12px;
+           letter-spacing:.32em;text-transform:uppercase;display:block;margin-bottom:8px}
+  .crew .nm{font-family:var(--serif);font-weight:600}
+  .crew .dot{color:var(--vermilion);margin:0 .5em}
+  .crew small{color:var(--paper-dim);font-size:.72em;font-family:var(--sans)}
+
+  /* ── index nav (magazine TOC) ──────────────────────── */
+  nav{margin-top:54px}
+  .nav-h{font-family:var(--serif);font-size:13px;letter-spacing:.4em;
+         text-transform:uppercase;color:var(--paper-dim);
+         display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .nav-h::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  a.row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+        gap:clamp(14px,3vw,38px);text-decoration:none;color:var(--paper);
+        padding:clamp(20px,3vw,30px) 6px;border-bottom:1px solid var(--line);
+        position:relative;overflow:hidden;isolation:isolate}
+  a.row::before{content:"";position:absolute;inset:0;z-index:-1;
+        background:linear-gradient(90deg,rgba(226,59,46,.16),rgba(226,59,46,0));
+        transform:translateX(-101%);transition:transform .5s cubic-bezier(.16,1,.3,1)}
+  a.row:hover::before{transform:translateX(0)}
+  a.row .idx{font-family:var(--serif);font-weight:700;font-size:clamp(20px,3vw,30px);
+        color:var(--vermilion);min-width:2.2ch;font-variant-numeric:tabular-nums}
+  a.row .mid{min-width:0}
+  a.row .ttl{font-family:var(--serif);font-weight:700;font-size:clamp(22px,3.6vw,38px);
+        line-height:1.05;display:flex;align-items:baseline;gap:.5em;flex-wrap:wrap}
+  a.row .ttl .kanji{font-size:.5em;color:var(--paper-dim);font-weight:500;letter-spacing:.12em}
+  a.row .desc{color:var(--paper-dim);font-size:clamp(13px,1.5vw,15px);margin-top:6px;max-width:54ch}
+  a.row .badge{display:inline-block;margin-top:10px;font-size:11px;letter-spacing:.06em;
+        color:var(--gold);border:1px solid rgba(217,164,65,.4);border-radius:2px;padding:2px 9px}
+  a.row .arr{font-family:var(--serif);font-size:clamp(24px,4vw,40px);color:var(--paper-dim);
+        transition:transform .35s cubic-bezier(.16,1,.3,1),color .35s}
+  a.row:hover .arr{transform:translateX(10px);color:var(--vermilion)}
+  a.row:hover .ttl{color:var(--paper)}
+
+  footer{margin-top:56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+         font-size:12px;color:var(--paper-dim);font-family:var(--serif);letter-spacing:.08em}
+  footer .seal{color:var(--vermilion);border:1px solid rgba(226,59,46,.5);
+        border-radius:50%;width:44px;height:44px;display:grid;place-items:center;
+        font-size:15px;transform:rotate(-8deg)}
+
+  /* ── load choreography ─────────────────────────────── */
+  .rise{opacity:0;transform:translateY(26px);animation:rise .9s cubic-bezier(.16,1,.3,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .d1{animation-delay:.05s}.d2{animation-delay:.18s}.d3{animation-delay:.32s}
+  .d4{animation-delay:.46s}.d5{animation-delay:.6s}.d6{animation-delay:.74s}
+  nav a.row{opacity:0;transform:translateY(20px);animation:rise .8s cubic-bezier(.16,1,.3,1) forwards}
+  nav a.row:nth-child(2){animation-delay:.7s}
+  nav a.row:nth-child(3){animation-delay:.82s}
+  nav a.row:nth-child(4){animation-delay:.94s}
+  nav a.row:nth-child(5){animation-delay:1.06s}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important;transform:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="hero">
-    <div class="flag">🇯🇵</div>
-    <h1>JAPAN 2026</h1>
-    <div class="dates">22.07. – 18.08.2026 · 28 Tage · Tokyo → Fuji → Izu → Kansai → Obon</div>
+  <div class="sun"></div>
+  <div class="glow"></div>
+  <svg class="grain"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#g)"/></svg>
 
-    <div class="count" id="count">
-      <div class="box"><div class="num" id="d">–</div><div class="unit">Tage</div></div>
-      <div class="box"><div class="num" id="h">–</div><div class="unit">Std</div></div>
-      <div class="box"><div class="num" id="m">–</div><div class="unit">Min</div></div>
-      <div class="box"><div class="num" id="s">–</div><div class="unit">Sek</div></div>
-    </div>
-    <div class="dates" id="countlabel">bis zum Abflug ✈️</div>
-
-    <div class="crew">
-      <span class="chip">Mats</span>
-      <span class="chip">Sebastian</span>
-      <span class="chip">Marko</span>
-      <span class="chip">Emre</span>
-      <span class="chip">Hendrik <small>· bis 08.08.</small></span>
-      <span class="chip">Cristobal <small>· ab 28.07.</small></span>
-    </div>
+  <div class="rail">
+    <span class="big">日本</span>
+    <span>旅 ・ 二〇二六 ・ ＴＯＫＹＯ</span>
   </div>
 
-  <div class="grid">
-    <a class="card accent-uber" href="uebersicht.html">
-      <div class="go">→</div>
-      <div class="ic">🗺️</div>
-      <h2>Übersicht</h2>
-      <p>Das Dashboard: Crew, Route, Budget & alle Unterkünfte auf einen Blick.</p>
-      <span class="badge">Status & Logistik</span>
-    </a>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow rise d1">クルー・ウィキ &nbsp;/&nbsp; The Crew Wiki</div>
+      <h1 class="title rise d2">
+        <span class="jp">ニッポン・エスケープ</span>
+        JAPAN <span class="yr">’26</span>
+      </h1>
+      <div class="meta rise d3">
+        <span><b>22. Juli</b> – <b>18. August 2026</b></span>
+        <span>28 Tage</span>
+        <span class="route">東京 → 富士 → 伊豆 → 関西 → お盆</span>
+      </div>
 
-    <a class="card accent-tag" href="tagesplan.html">
-      <div class="go">→</div>
-      <div class="ic">📅</div>
-      <h2>Tagesplan</h2>
-      <p>Alle 28 Tage Slide für Slide — mit den Aktivitäten aus der Crew-Umfrage.</p>
-      <span class="badge">Tag für Tag</span>
-    </a>
+      <div class="count rise d4">
+        <div class="lead">出発まで</div>
+        <div class="cu"><span class="n" id="d">–</span><span class="l">Tage</span></div>
+        <div class="cu sep"><span class="n" id="h">–</span><span class="l">Std</span></div>
+        <div class="cu sep"><span class="n" id="m">–</span><span class="l">Min</span></div>
+        <div class="cu sep"><span class="n" id="s">–</span><span class="l">Sek</span></div>
+      </div>
+      <div id="countlabel" style="font-family:var(--serif);color:var(--paper-dim);letter-spacing:.1em;font-size:13px" class="rise d4">bis zum Abflug ✈</div>
 
-    <a class="card" href="ergebnisse.html">
-      <div class="go">→</div>
-      <div class="ic">📊</div>
-      <h2>Umfrage-Auswertung</h2>
-      <p>Was die Crew wirklich will: Vibe-Profil, Must-See-Ranking & Konsens.</p>
-      <span class="badge">6 / 6 Antworten ✓</span>
-    </a>
+      <div class="crew rise d5">
+        <span class="k">クルー — 6 Mann</span>
+        <span class="nm">Mats</span><span class="dot">・</span><span class="nm">Sebastian</span><span class="dot">・</span><span class="nm">Marko</span><span class="dot">・</span><span class="nm">Emre</span><span class="dot">・</span><span class="nm">Hendrik</span> <small>bis 08.08.</small><span class="dot">・</span><span class="nm">Cristobal</span> <small>ab 28.07.</small>
+      </div>
+    </header>
 
-    <a class="card" href="umfrage.html">
-      <div class="go">→</div>
-      <div class="ic">📝</div>
-      <h2>Stimmungs-Umfrage</h2>
-      <p>Das Formular — nochmal durchklicken oder Codes auswerten.</p>
-      <span class="badge">Mitmachen</span>
-    </a>
+    <nav>
+      <div class="nav-h rise d6">目次 — Index</div>
+
+      <a class="row" href="uebersicht.html">
+        <span class="idx">01</span>
+        <span class="mid">
+          <span class="ttl">Übersicht <span class="kanji">全体図</span></span>
+          <span class="desc">Das Dashboard — Crew, Route, Budget &amp; alle sechs Unterkünfte auf einen Blick.</span>
+          <span class="badge">Status &amp; Logistik</span>
+        </span>
+        <span class="arr">→</span>
+      </a>
+
+      <a class="row" href="tagesplan.html">
+        <span class="idx">02</span>
+        <span class="mid">
+          <span class="ttl">Tagesplan <span class="kanji">日程</span></span>
+          <span class="desc">Alle 28 Tage, Slide für Slide — mit den Aktivitäten direkt aus der Crew-Umfrage.</span>
+          <span class="badge">Tag für Tag</span>
+        </span>
+        <span class="arr">→</span>
+      </a>
+
+      <a class="row" href="ergebnisse.html">
+        <span class="idx">03</span>
+        <span class="mid">
+          <span class="ttl">Auswertung <span class="kanji">結果</span></span>
+          <span class="desc">Was die Crew wirklich will — Vibe-Profil, Must-See-Ranking &amp; Konsens.</span>
+          <span class="badge">6 / 6 Antworten ✓</span>
+        </span>
+        <span class="arr">→</span>
+      </a>
+
+      <a class="row" href="umfrage.html">
+        <span class="idx">04</span>
+        <span class="mid">
+          <span class="ttl">Umfrage <span class="kanji">調査</span></span>
+          <span class="desc">Das Formular — nochmal durchklicken oder eingehende Codes auswerten.</span>
+          <span class="badge">Mitmachen</span>
+        </span>
+        <span class="arr">→</span>
+      </a>
+    </nav>
+
+    <footer>
+      <span>Crew-internes Reise-Wiki · keine exakten Adressen</span>
+      <span class="seal">旅</span>
+      <span>Strong Zero approved 🍶</span>
+    </footer>
   </div>
-
-  <footer>
-    Crew-internes Reise-Wiki · keine exakten Adressen · <code>self-contained</code><br>
-    Gebaut mit zu viel Strong Zero 🍶
-  </footer>
-</div>
 
 <script>
   const target = new Date("2026-07-22T00:00:00+09:00").getTime();
   const el = { d:document.getElementById('d'), h:document.getElementById('h'),
                m:document.getElementById('m'), s:document.getElementById('s'),
                label:document.getElementById('countlabel') };
+  function pad(n){return String(n).padStart(2,'0');}
   function tick(){
     const diff = target - Date.now();
-    if(diff <= 0){ el.label.textContent = "🎉 Es geht los — Sayonara Deutschland!"; el.d.textContent=el.h.textContent=el.m.textContent=el.s.textContent="0"; return; }
-    const day = Math.floor(diff/864e5);
-    const hr  = Math.floor(diff%864e5/36e5);
-    const min = Math.floor(diff%36e5/6e4);
-    const sec = Math.floor(diff%6e4/1e3);
-    el.d.textContent=day; el.h.textContent=String(hr).padStart(2,'0');
-    el.m.textContent=String(min).padStart(2,'0'); el.s.textContent=String(sec).padStart(2,'0');
+    if(diff <= 0){ el.label.textContent = "出発 — es geht los. Sayonara Deutschland!";
+      el.d.textContent=el.h.textContent=el.m.textContent=el.s.textContent="0"; return; }
+    el.d.textContent = Math.floor(diff/864e5);
+    el.h.textContent = pad(Math.floor(diff%864e5/36e5));
+    el.m.textContent = pad(Math.floor(diff%36e5/6e4));
+    el.s.textContent = pad(Math.floor(diff%6e4/1e3));
   }
   tick(); setInterval(tick,1000);
 </script>
